@@ -16,7 +16,12 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
   final int _requiredCount = 18;
   final int _totalCount = 24;
 
+  int _powerAttendedCount = 2;
+  final int _powerRequiredCount = 4;
+  final int _powerTotalCount = 6;
+
   late AnimationController _radialController;
+  late AnimationController _powerRadialController;
 
   @override
   void initState() {
@@ -26,11 +31,18 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
       duration: const Duration(seconds: 1),
     );
     _radialController.forward();
+
+    _powerRadialController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    _powerRadialController.forward();
   }
 
   @override
   void dispose() {
     _radialController.dispose();
+    _powerRadialController.dispose();
     super.dispose();
   }
 
@@ -77,170 +89,374 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
     });
   }
 
+  void _simulatePowerQrScan() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const QrScannerSimDialog();
+      },
+    ).then((scanned) {
+      if (scanned == true) {
+        setState(() {
+          if (_powerAttendedCount < _powerTotalCount) {
+            _powerAttendedCount++;
+            // Re-run radial animation
+            _powerRadialController.reset();
+            _powerRadialController.forward();
+          }
+        });
+
+        // Add a mock meeting to the top
+        final mockMeeting = Meeting(
+          title: "POWER MEETING (SCANNED)",
+          date: DateTime.now().toString().split(" ")[0],
+          type: "Other Meet",
+          attended: true,
+        );
+        MockData.meetings.insert(0, mockMeeting);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text("QR Code scan successful! Power Meeting attendance logged."),
+              ],
+            ),
+            backgroundColor: AppTheme.success,
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double attendancePercent = _attendedCount / _requiredCount;
+    double powerAttendancePercent = _powerAttendedCount / _powerRequiredCount;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight - 40,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Attendance Summary Visuals (Radial progress + metrics)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left side: Radial indicator card (3rd image box)
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        height: 240, // Match height of right side cards
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                          border: Border.all(color: AppTheme.border.withOpacity(0.5)),
-                        ),
-                        child: Center(
-                          child: AnimatedBuilder(
-                            animation: _radialController,
-                            builder: (context, child) {
-                              return CustomPaint(
-                                painter: AttendanceRadialPainter(
-                                  percentage: attendancePercent * _radialController.value,
-                                  primaryColor: AppTheme.primary,
-                                  accentColor: AppTheme.secondary,
-                                  backgroundColor: AppTheme.background,
-                                ),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "${(attendancePercent * 100).toInt()}%",
-                                        style: const TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTheme.textPrimary,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      const Text(
-                                        "Attended",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: AppTheme.textSecondary,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Section 1: Regular Meetings
+              const Text(
+                "Regular Meetings",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left side: Radial indicator card
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      height: 160, // Balanced height
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
                           ),
+                        ],
+                        border: Border.all(color: AppTheme.border.withOpacity(0.4)),
+                      ),
+                      child: Center(
+                        child: AnimatedBuilder(
+                          animation: _radialController,
+                          builder: (context, child) {
+                            return CustomPaint(
+                              painter: AttendanceRadialPainter(
+                                percentage: attendancePercent * _radialController.value,
+                                primaryColor: AppTheme.primary,
+                                accentColor: AppTheme.secondary,
+                                backgroundColor: AppTheme.background,
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${(attendancePercent * 100).toInt()}%",
+                                      style: const TextStyle(
+                                        fontSize: 22, // Taller font size
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    const Text(
+                                      "Attended",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppTheme.textSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    // Right side: Column of 3 boxes
-                    Expanded(
-                      flex: 5,
-                      child: SizedBox(
-                        height: 240,
-                        child: Column(
-                          children: [
-                            _buildStatBox(
-                              icon: Icons.event,
-                              label: "Total Meetings",
-                              value: "$_totalCount",
-                              color: AppTheme.primary,
-                            ),
-                            const SizedBox(height: 10),
-                            _buildStatBox(
-                              icon: Icons.star_border,
-                              label: "Compulsary",
-                              value: "$_requiredCount",
-                              color: AppTheme.secondary,
-                            ),
-                            const SizedBox(height: 10),
-                            _buildStatBox(
-                              icon: Icons.check_circle_outline,
-                              label: "Attended",
-                              value: "$_attendedCount",
-                              color: AppTheme.success,
-                            ),
-                          ],
-                        ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Right side: Column of 3 boxes
+                  Expanded(
+                    flex: 5,
+                    child: SizedBox(
+                      height: 160, // Balanced height
+                      child: Column(
+                        children: [
+                          _buildStatBox(
+                            icon: Icons.event,
+                            label: "Total Meetings",
+                            value: "$_totalCount",
+                            color: AppTheme.primary,
+                          ),
+                          const SizedBox(height: 6),
+                          _buildStatBox(
+                            icon: Icons.star_border,
+                            label: "Compulsary",
+                            value: "$_requiredCount",
+                            color: AppTheme.secondary,
+                          ),
+                          const SizedBox(height: 6),
+                          _buildStatBox(
+                            icon: Icons.check_circle_outline,
+                            label: "Attended",
+                            value: "$_attendedCount",
+                            color: AppTheme.success,
+                          ),
+                        ],
                       ),
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Scan QR Code Action Button
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: AppTheme.goldGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.secondary.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    )
                   ],
                 ),
-                const SizedBox(height: 20),
-
-                // Scan QR Code Action Button
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    gradient: AppTheme.goldGradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.secondary.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: _simulateQrScan,
-                      borderRadius: BorderRadius.circular(14),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.white24,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 22),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _simulateQrScan,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14), // Taller vertical padding
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.white24,
+                              shape: BoxShape.circle,
                             ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              "Scan QR Code to Check-In",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
+                            child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 18),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "Scan QR Code to Check-In",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 24), // Balanced section spacing
+
+              // Section 2: Power Meeting
+              const Text(
+                "Power Meeting",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left side: Radial indicator card
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      height: 160, // Balanced height
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                        border: Border.all(color: AppTheme.border.withOpacity(0.4)),
+                      ),
+                      child: Center(
+                        child: AnimatedBuilder(
+                          animation: _powerRadialController,
+                          builder: (context, child) {
+                            return CustomPaint(
+                              painter: AttendanceRadialPainter(
+                                percentage: powerAttendancePercent * _powerRadialController.value,
+                                primaryColor: AppTheme.primary,
+                                accentColor: AppTheme.secondary,
+                                backgroundColor: AppTheme.background,
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${(powerAttendancePercent * 100).toInt()}%",
+                                      style: const TextStyle(
+                                        fontSize: 22, // Taller font size
+                                        fontWeight: FontWeight.bold,
+                                        color: AppTheme.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    const Text(
+                                      "Attended",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppTheme.textSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Right side: Column of 3 boxes
+                  Expanded(
+                    flex: 5,
+                    child: SizedBox(
+                      height: 160, // Balanced height
+                      child: Column(
+                        children: [
+                          _buildStatBox(
+                            icon: Icons.event,
+                            label: "Total Meetings",
+                            value: "$_powerTotalCount",
+                            color: AppTheme.primary,
+                          ),
+                          const SizedBox(height: 6),
+                          _buildStatBox(
+                            icon: Icons.star_border,
+                            label: "Compulsary",
+                            value: "$_powerRequiredCount",
+                            color: AppTheme.secondary,
+                          ),
+                          const SizedBox(height: 6),
+                          _buildStatBox(
+                            icon: Icons.check_circle_outline,
+                            label: "Attended",
+                            value: "$_powerAttendedCount",
+                            color: AppTheme.success,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Scan QR Code Action Button
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: AppTheme.goldGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.secondary.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    )
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _simulatePowerQrScan,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14), // Taller vertical padding
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.white24,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 18),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "Scan QR Code to Check-In",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -257,28 +473,28 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10), // Clean rounding
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+          border: Border.all(color: AppTheme.border.withOpacity(0.4)),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), // Compact padding to prevent overflow
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: color, size: 16),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -292,11 +508,11 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   Text(
                     value,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15, // Prominent value text
                       fontWeight: FontWeight.bold,
                       color: color == AppTheme.success ? AppTheme.success : AppTheme.textPrimary,
                     ),
@@ -329,7 +545,7 @@ class AttendanceRadialPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double strokeWidth = 8.0;
+    double strokeWidth = 7.0; // Taller stroke width
     Offset center = Offset(size.width / 2, size.height / 2);
     double radius = min(size.width / 2, size.height / 2) - strokeWidth / 2;
 

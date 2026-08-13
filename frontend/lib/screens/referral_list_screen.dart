@@ -47,7 +47,7 @@ class _ReferralListScreenState extends State<ReferralListScreen> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: AppTheme.border, height: 1.0),
+          child: Container(color: Colors.white24, height: 1.0),
         ),
       ),
       body: referrals.isEmpty

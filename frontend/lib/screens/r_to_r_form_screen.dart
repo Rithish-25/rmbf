@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
 import '../models.dart';
+import 'r_to_r_history_screen.dart';
 
 class RtoRFormScreen extends StatefulWidget {
   const RtoRFormScreen({super.key});
@@ -75,6 +76,16 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
       return;
     }
 
+    // Add to history
+    MockData.rtoRHistories.insert(
+      0,
+      RtoREntry(
+        userName: _nameController.text,
+        partnerName: _selectedMember!,
+        date: _dateController.text,
+      ),
+    );
+
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -94,9 +105,21 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history_outlined),
+            tooltip: "View History",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RtoRHistoryScreen()),
+              );
+            },
+          )
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: AppTheme.border, height: 1.0),
+          child: Container(color: Colors.white24, height: 1.0),
         ),
       ),
       body: SingleChildScrollView(

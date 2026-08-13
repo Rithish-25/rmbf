@@ -13,6 +13,12 @@ class Member {
   final String? profileImage;
   final bool isPro;
   final String kootam;
+  final String dob;
+  final String weddingDay;
+  final String companyOpenDay;
+  final String officeAddress;
+  final String powerMeetingName;
+  final String position;
 
   Member({
     required this.name,
@@ -29,7 +35,59 @@ class Member {
     this.profileImage,
     required this.isPro,
     required this.kootam,
+    this.dob = "",
+    this.weddingDay = "",
+    this.companyOpenDay = "",
+    this.officeAddress = "",
+    this.powerMeetingName = "UNITY Power Meeting",
+    this.position = "Member",
   });
+
+  Member copyWith({
+    String? name,
+    String? businessName,
+    String? chapter,
+    String? location,
+    String? phone,
+    String? bloodGroup,
+    String? nativeAddress,
+    String? email,
+    String? fatherName,
+    String? spouseName,
+    String? education,
+    String? profileImage,
+    bool? isPro,
+    String? kootam,
+    String? dob,
+    String? weddingDay,
+    String? companyOpenDay,
+    String? officeAddress,
+    String? powerMeetingName,
+    String? position,
+  }) {
+    return Member(
+      name: name ?? this.name,
+      businessName: businessName ?? this.businessName,
+      chapter: chapter ?? this.chapter,
+      location: location ?? this.location,
+      phone: phone ?? this.phone,
+      bloodGroup: bloodGroup ?? this.bloodGroup,
+      nativeAddress: nativeAddress ?? this.nativeAddress,
+      email: email ?? this.email,
+      fatherName: fatherName ?? this.fatherName,
+      spouseName: spouseName ?? this.spouseName,
+      education: education ?? this.education,
+      profileImage: profileImage ?? this.profileImage,
+      isPro: isPro ?? this.isPro,
+      kootam: kootam ?? this.kootam,
+      dob: dob ?? this.dob,
+      weddingDay: weddingDay ?? this.weddingDay,
+      companyOpenDay: companyOpenDay ?? this.companyOpenDay,
+      officeAddress: officeAddress ?? this.officeAddress,
+      powerMeetingName: powerMeetingName ?? this.powerMeetingName,
+      position: position ?? this.position,
+    );
+  }
 }
 
 class Meeting {
@@ -51,6 +109,7 @@ class ThanksNote {
   final String memberName;
   final String businessName;
   final double amount;
+  final bool isReferral;
   final bool isGiven; // true if Given, false if Taken
   final String date;
   final String? attachmentName;
@@ -62,6 +121,7 @@ class ThanksNote {
     required this.memberName,
     required this.businessName,
     required this.amount,
+    required this.isReferral,
     required this.isGiven,
     required this.date,
     this.attachmentName,
@@ -86,6 +146,12 @@ class MockData {
     profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop&q=80",
     isPro: true,
     kootam: "Unity",
+    dob: "1988-06-15",
+    weddingDay: "2013-11-20",
+    companyOpenDay: "2018-03-10",
+    officeAddress: "45, Perundurai Road, Erode - 638011",
+    powerMeetingName: "UNITY Power Meeting",
+    position: "President",
   );
 
   static final List<Member> members = [
@@ -104,6 +170,10 @@ class MockData {
       profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&fit=crop&q=80",
       isPro: false,
       kootam: "N/A",
+      dob: "1986-04-12",
+      weddingDay: "2012-05-18",
+      companyOpenDay: "2015-09-01",
+      officeAddress: "Salem Main Road, Erode",
     ),
     Member(
       name: "A. Muthukumar",
@@ -120,6 +190,10 @@ class MockData {
       profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&fit=crop&q=80",
       isPro: true,
       kootam: "Unity",
+      dob: "1990-12-05",
+      weddingDay: "2017-02-14",
+      companyOpenDay: "2019-06-20",
+      officeAddress: "Perundurai, Erode",
     ),
     Member(
       name: "A. Kaleeswaran",
@@ -136,6 +210,10 @@ class MockData {
       profileImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&fit=crop&q=80",
       isPro: true,
       kootam: "Unity",
+      dob: "1984-07-22",
+      weddingDay: "2010-09-15",
+      companyOpenDay: "2012-11-05",
+      officeAddress: "Tiruppur",
     ),
     Member(
       name: "Aarthi G P",
@@ -152,6 +230,10 @@ class MockData {
       profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&fit=crop&q=80",
       isPro: false,
       kootam: "N/A",
+      dob: "1993-09-18",
+      weddingDay: "2020-01-25",
+      companyOpenDay: "2021-08-10",
+      officeAddress: "Coimbatore",
     ),
     Member(
       name: "A. Loganathan",
@@ -168,6 +250,10 @@ class MockData {
       profileImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&fit=crop&q=80",
       isPro: true,
       kootam: "Unity",
+      dob: "1985-03-30",
+      weddingDay: "2011-06-22",
+      companyOpenDay: "2014-04-15",
+      officeAddress: "Bhavani, Erode",
     ),
   ];
 
@@ -187,6 +273,7 @@ class MockData {
       memberName: "A Suresh Kumar",
       businessName: "The Event Today",
       amount: 150000,
+      isReferral: true,
       isGiven: true,
       date: "2026-08-09",
       referralType: "Other",
@@ -197,6 +284,7 @@ class MockData {
       memberName: "A. Muthukumar",
       businessName: "Srivari Digital Land Surveying",
       amount: 653604,
+      isReferral: true,
       isGiven: true,
       date: "2026-08-05",
       referralType: "Other",
@@ -207,6 +295,7 @@ class MockData {
       memberName: "A. Kaleeswaran",
       businessName: "Rajalakshmi Textile",
       amount: 1250000,
+      isReferral: false,
       isGiven: false,
       date: "2026-08-04",
     ),
@@ -215,10 +304,41 @@ class MockData {
       memberName: "Aarthi G P",
       businessName: "Saagitya Food Products",
       amount: 625872,
+      isReferral: false,
       isGiven: false,
       date: "2026-07-28",
     ),
   ];
+
+  static final List<RtoREntry> rtoRHistories = [
+    RtoREntry(
+      userName: "Santhosh M.R.",
+      partnerName: "A Suresh Kumar",
+      date: "2026-08-10",
+    ),
+    RtoREntry(
+      userName: "Santhosh M.R.",
+      partnerName: "A. Muthukumar",
+      date: "2026-08-08",
+    ),
+    RtoREntry(
+      userName: "Santhosh M.R.",
+      partnerName: "A. Kaleeswaran",
+      date: "2026-08-04",
+    ),
+  ];
+}
+
+class RtoREntry {
+  final String userName;
+  final String partnerName;
+  final String date;
+
+  RtoREntry({
+    required this.userName,
+    required this.partnerName,
+    required this.date,
+  });
 }
 
 class Booking {

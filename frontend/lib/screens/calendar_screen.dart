@@ -530,14 +530,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 // Legend
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 8,
+                  padding: const EdgeInsets.only(left: 48, right: 20, top: 12, bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _LegendItem(type: "Meeting Schedule", color: _getTypeColor("Meeting Schedule")),
+                      const SizedBox(height: 14),
                       _LegendItem(type: "Birthday", color: _getTypeColor("Birthday")),
+                      const SizedBox(height: 14),
                       _LegendItem(type: "Wedding Day", color: _getTypeColor("Wedding Day")),
+                      const SizedBox(height: 14),
                       _LegendItem(type: "Company Open Day", color: _getTypeColor("Company Open Day")),
                     ],
                   ),
@@ -602,20 +604,20 @@ class _LegendItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 8,
-          height: 8,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: color,
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 12),
         Text(
           type,
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             color: AppTheme.textPrimary,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],

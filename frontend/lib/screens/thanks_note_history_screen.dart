@@ -5,7 +5,7 @@ import '../models.dart';
 
 class ThanksNoteHistoryScreen extends StatefulWidget {
   final String initialFilter;
-  const ThanksNoteHistoryScreen({super.key, this.initialFilter = "All"});
+  const ThanksNoteHistoryScreen({super.key, this.initialFilter = "Referal"});
 
   @override
   State<ThanksNoteHistoryScreen> createState() => _ThanksNoteHistoryScreenState();
@@ -13,11 +13,78 @@ class ThanksNoteHistoryScreen extends StatefulWidget {
 
 class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
   late String _selectedFilter;
+  DateTimeRange? _selectedDateRange;
+  bool _isTuesdayFilter = true;
 
   @override
   void initState() {
     super.initState();
-    _selectedFilter = widget.initialFilter;
+    // Map initial filter
+    if (widget.initialFilter == "Given" || widget.initialFilter == "Taken") {
+      _selectedFilter = "Thanks Note";
+    } else {
+      _selectedFilter = widget.initialFilter;
+    }
+    _setTuesdayRange();
+  }
+
+  void _setTuesdayRange() {
+    final now = DateTime.now();
+    // Tuesday is 2
+    int daysToSubtract = (now.weekday - DateTime.tuesday) % 7;
+    if (daysToSubtract < 0) daysToSubtract += 7;
+    final lastTuesday = DateTime(now.year, now.month, now.day).subtract(Duration(days: daysToSubtract));
+    final start = lastTuesday.subtract(const Duration(days: 7));
+    _selectedDateRange = DateTimeRange(start: start, end: lastTuesday);
+    _isTuesdayFilter = true;
+  }
+
+  bool _isWithinRange(String dateStr) {
+    try {
+      final parts = dateStr.split("-");
+      if (parts.length == 3) {
+        final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+        if (_selectedDateRange != null) {
+          final start = DateTime(_selectedDateRange!.start.year, _selectedDateRange!.start.month, _selectedDateRange!.start.day);
+          final end = DateTime(_selectedDateRange!.end.year, _selectedDateRange!.end.month, _selectedDateRange!.end.day);
+          return (date.isAtSameMomentAs(start) || date.isAfter(start)) &&
+                 (date.isAtSameMomentAs(end) || date.isBefore(end));
+        }
+      }
+    } catch (_) {}
+    return true;
+  }
+
+  Future<void> _pickDateRange() async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2025),
+      lastDate: DateTime(2030),
+      initialDateRange: _selectedDateRange,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppTheme.primary,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: AppTheme.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDateRange = picked;
+        _isTuesdayFilter = false;
+      });
+    }
+  }
+
+  String _formatDateToShow(DateTime dt) {
+    return "${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}";
   }
 
   Widget _buildFilterTab(String label) {
@@ -43,14 +110,25 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
   }
 
   Alignment _getAlignmentForFilter(String filter) {
-    if (filter == "All") return Alignment.centerLeft;
-    if (filter == "Given") return Alignment.center;
+    if (filter == "Referal") return Alignment.centerLeft;
     return Alignment.centerRight;
+  }
+
+
+
+  String _formatDate(String rawDate) {
+    try {
+      final parts = rawDate.split("-");
+      if (parts.length == 3) {
+        return "${parts[2].padLeft(2, '0')}-${parts[1].padLeft(2, '0')}-${parts[0]}";
+      }
+    } catch (_) {}
+    return rawDate;
   }
 
   String _formatCurrency(double value) {
     String valStr = value.toInt().toString();
-    if (valStr.length <= 3) return valStr;
+    if (valStr.length <= 3) return "₹$valStr";
     String lastThree = valStr.substring(valStr.length - 3);
     String remaining = valStr.substring(0, valStr.length - 3);
     
@@ -64,17 +142,7 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
         count = 0;
       }
     }
-    return "$formattedRemaining,$lastThree";
-  }
-
-  String _formatDate(String rawDate) {
-    try {
-      final parts = rawDate.split("-");
-      if (parts.length == 3) {
-        return "${int.parse(parts[2])}/${int.parse(parts[1])}/${parts[0]}";
-      }
-    } catch (_) {}
-    return rawDate;
+    return "₹$formattedRemaining,$lastThree";
   }
 
   void _editNoteDialog(ThanksNote note) {
@@ -135,6 +203,7 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                         memberName: name,
                         businessName: note.businessName,
                         amount: amount,
+                        isReferral: note.isReferral,
                         isGiven: note.isGiven,
                         date: note.date,
                         attachmentName: note.attachmentName,
@@ -192,10 +261,15 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
 
   Widget _buildHistoryList() {
     final filteredNotes = MockData.thanksNotes.where((note) {
-      if (_selectedFilter == "All") return true;
-      if (_selectedFilter == "Given") return note.isGiven;
-      if (_selectedFilter == "Taken") return !note.isGiven;
-      return true;
+      bool matchesTab = false;
+      if (_selectedFilter == "Referal") {
+        matchesTab = note.isReferral;
+      } else if (_selectedFilter == "Thanks Note") {
+        matchesTab = !note.isReferral && !note.isGiven;
+      }
+      
+      if (!matchesTab) return false;
+      return _isWithinRange(note.date);
     }).toList();
 
     if (filteredNotes.isEmpty) {
@@ -212,6 +286,44 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
       itemCount: filteredNotes.length,
       itemBuilder: (context, index) {
         final note = filteredNotes[index];
+        
+        String cardLabel;
+        Color labelColor;
+        if (note.isReferral) {
+          cardLabel = "Referal";
+          labelColor = AppTheme.primary;
+        } else if (note.isGiven) {
+          cardLabel = "Given";
+          labelColor = AppTheme.error;
+        } else {
+          cardLabel = "Thanks Note";
+          labelColor = AppTheme.success;
+        }
+
+        String titleText;
+        String subtitleText;
+
+        if (note.isReferral) {
+          if (note.referralType == "Self") {
+            titleText = MockData.currentUser.name;
+            subtitleText = note.businessName;
+          } else {
+            titleText = note.businessName;
+            subtitleText = "Referred to ${note.memberName}";
+          }
+        } else {
+          if (note.referralType == "Connect") {
+            titleText = note.businessName;
+            subtitleText = "Received via ${note.memberName}";
+          } else if (note.referralType == "Direct") {
+            titleText = MockData.currentUser.name;
+            subtitleText = "Received from ${note.memberName}";
+          } else {
+            titleText = note.memberName;
+            subtitleText = note.businessName;
+          }
+        }
+
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(16),
@@ -234,7 +346,7 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    note.memberName,
+                    titleText,
                     style: GoogleFonts.outfit(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -242,30 +354,21 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                     ),
                   ),
                   Text(
-                    note.isGiven ? "Given" : "Taken",
+                    cardLabel,
                     style: GoogleFonts.outfit(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: note.isGiven ? AppTheme.error : AppTheme.success,
+                      color: labelColor,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                note.businessName,
+                subtitleText,
                 style: GoogleFonts.outfit(
                   fontSize: 13,
                   color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                "₹ ${_formatCurrency(note.amount)}",
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -273,14 +376,37 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    _formatDate(note.date),
-                    style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      color: const Color(0xFF9CA3AF),
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        _formatDate(note.date),
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                      if (note.amount > 0) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          "•",
+                          style: GoogleFonts.outfit(
+                            fontSize: 12,
+                            color: const Color(0xFF9CA3AF),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _formatCurrency(note.amount),
+                          style: GoogleFonts.outfit(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  if (note.isGiven)
+                  if (!note.isGiven && !note.isReferral)
                     Row(
                       children: [
                         GestureDetector(
@@ -329,41 +455,23 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        title: const Text("Thanksnote History"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(color: Colors.white24, height: 1.0),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Thanksnote History",
-                    style: GoogleFonts.outfit(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEFF6FF), // Soft light blue background
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: AppTheme.primary, // Dark Blue close button
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
               Container(
                 height: 48,
                 padding: const EdgeInsets.all(4),
@@ -380,7 +488,7 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                       curve: Curves.easeInOut,
                       alignment: _getAlignmentForFilter(_selectedFilter),
                       child: FractionallySizedBox(
-                        widthFactor: 0.33,
+                        widthFactor: 0.5,
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppTheme.primary,
@@ -392,20 +500,123 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                     // Buttons text
                     Row(
                       children: [
-                        _buildFilterTab("All"),
-                        _buildFilterTab("Given"),
-                        _buildFilterTab("Taken"),
+                        _buildFilterTab("Referal"),
+                        _buildFilterTab("Thanks Note"),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
+              
+              // Tuesday to Tuesday date filter status card
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppTheme.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.01),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: _isTuesdayFilter 
+                            ? AppTheme.success.withOpacity(0.1) 
+                            : AppTheme.primary.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _isTuesdayFilter ? Icons.event_repeat : Icons.date_range,
+                        size: 14,
+                        color: _isTuesdayFilter ? AppTheme.success : AppTheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _isTuesdayFilter 
+                                ? "Tuesday to Tuesday Term" 
+                                : "Custom Date Range",
+                            style: GoogleFonts.outfit(
+                              fontSize: 10,
+                              color: AppTheme.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          Text(
+                            _selectedDateRange != null
+                                ? "${_formatDateToShow(_selectedDateRange!.start)} - ${_formatDateToShow(_selectedDateRange!.end)}"
+                                : "All History",
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!_isTuesdayFilter)
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _setTuesdayRange();
+                          });
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "Reset",
+                          style: GoogleFonts.outfit(
+                            fontSize: 12,
+                            color: AppTheme.error,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    else
+                      TextButton(
+                        onPressed: _pickDateRange,
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "Sort/Filter",
+                          style: GoogleFonts.outfit(
+                            fontSize: 12,
+                            color: AppTheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              
               Expanded(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
                   child: KeyedSubtree(
-                    key: ValueKey(_selectedFilter),
+                    key: ValueKey(_selectedFilter + (_selectedDateRange?.toString() ?? '')),
                     child: _buildHistoryList(),
                   ),
                 ),

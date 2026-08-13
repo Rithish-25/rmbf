@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:convert';
 
 class AppTheme {
   static const Color primary = Color(0xFF1E3A8A); // Dark Blue
@@ -9,8 +10,8 @@ class AppTheme {
   static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
   static const Color border = Color(0xFFE5E7EB);
-  static const Color success = Color(0xFF10B981);
-  static const Color error = Color(0xFFEF4444);
+  static const Color success = Color(0xFF43A047); // Medium Green (Green 600)
+  static const Color error = Color(0xFFE53935); // Medium Red (Red 600)
 
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
@@ -47,13 +48,14 @@ class AppTheme {
       
       // Centralized AppBar theme with premium layout guidelines
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: primary,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: primary, size: 22),
-        actionsIconTheme: const IconThemeData(color: primary, size: 22),
+        toolbarHeight: 68.0,
+        iconTheme: const IconThemeData(color: Colors.white, size: 22),
+        actionsIconTheme: const IconThemeData(color: Colors.white, size: 22),
         titleTextStyle: GoogleFonts.outfit(
-          color: primary,
+          color: Colors.white,
           fontSize: 21,
           fontWeight: FontWeight.bold, // Bold/Semi-Bold modern style
           letterSpacing: -0.3,
@@ -157,13 +159,26 @@ class MemberAvatar extends StatelessWidget {
   final String name;
   final double radius;
   final TextStyle? textStyle;
+  final String? profileImage;
 
   const MemberAvatar({
     super.key,
     required this.name,
     this.radius = 30,
     this.textStyle,
+    this.profileImage,
   });
+
+  ImageProvider _getImageProvider(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return NetworkImage(path);
+    } else if (path.startsWith('data:image')) {
+      final base64Content = path.split(',').last;
+      return MemoryImage(base64Decode(base64Content));
+    } else {
+      return NetworkImage(path);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,16 +195,26 @@ class MemberAvatar extends StatelessWidget {
       initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
     }
 
+    final hasImage = profileImage != null && profileImage!.isNotEmpty;
+
     return Container(
       width: radius * 2,
       height: radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [AppTheme.primary, Color(0xFF1E40AF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        image: hasImage
+            ? DecorationImage(
+                image: _getImageProvider(profileImage!),
+                fit: BoxFit.cover,
+              )
+            : null,
+        gradient: hasImage
+            ? null
+            : const LinearGradient(
+                colors: [AppTheme.primary, Color(0xFF1E40AF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -200,15 +225,17 @@ class MemberAvatar extends StatelessWidget {
         ],
       ),
       alignment: Alignment.center,
-      child: Text(
-        initials,
-        style: textStyle ??
-            GoogleFonts.outfit(
-              color: AppTheme.secondary,
-              fontWeight: FontWeight.bold,
-              fontSize: radius * 0.75,
+      child: hasImage
+          ? null
+          : Text(
+              initials,
+              style: textStyle ??
+                  GoogleFonts.outfit(
+                    color: AppTheme.secondary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: radius * 0.75,
+                  ),
             ),
-      ),
     );
   }
 }

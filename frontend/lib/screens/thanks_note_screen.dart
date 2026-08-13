@@ -17,9 +17,14 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
   
   // Referral specific controllers and states
   String _referralType = "Self";
+  String? _selectedReferralMember;
   final _referralNameController = TextEditingController();
   final _referralPhoneController = TextEditingController();
   final _referralBusinessController = TextEditingController();
+
+  // Thank You specific controllers and states
+  String _thankYouType = "Member";
+  final _thankYouConnectionController = TextEditingController();
 
   bool _isGiven = true;
 
@@ -30,6 +35,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
     _referralNameController.dispose();
     _referralPhoneController.dispose();
     _referralBusinessController.dispose();
+    _thankYouConnectionController.dispose();
     super.dispose();
   }
 
@@ -64,37 +70,61 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
     String businessName = "";
 
     if (_isGiven) {
-      if (_referralType == "Other") {
-        memberName = _referralNameController.text.trim();
-        final phone = _referralPhoneController.text.trim();
-        businessName = _referralBusinessController.text.trim();
-
-        if (memberName.isEmpty || phone.isEmpty || businessName.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Please fill in Referral Name, Phone No, and Business Name!"),
-              backgroundColor: AppTheme.error,
-            ),
-          );
-          return;
-        }
-      } else {
-        // Self Referral
-        memberName = MockData.currentUser.name;
-        businessName = MockData.currentUser.businessName;
-      }
-    } else {
-      memberName = _partnerController.text.trim();
-      if (memberName.isEmpty) {
+      if (_selectedReferralMember == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Please search and select a partner!"),
+            content: Text("Please select a member!"),
             backgroundColor: AppTheme.error,
           ),
         );
         return;
       }
-      businessName = memberName.contains(" ") ? memberName : "$memberName Business Solutions";
+
+      final targetMember = MockData.members.firstWhere(
+        (m) => m.name == _selectedReferralMember,
+        orElse: () => MockData.members.first,
+      );
+
+      if (_referralType == "Connect") {
+        final connectName = _referralNameController.text.trim();
+        if (connectName.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Please enter connection details!"),
+              backgroundColor: AppTheme.error,
+            ),
+          );
+          return;
+        }
+        memberName = targetMember.name;
+        businessName = connectName;
+      } else {
+        // Self Referral
+        memberName = targetMember.name;
+        businessName = targetMember.businessName;
+      }
+    } else {
+      if (_thankYouType == "Member") {
+        final targetMember = MockData.members.isNotEmpty ? MockData.members.first : MockData.currentUser;
+        memberName = targetMember.name;
+        businessName = targetMember.businessName;
+      } else if (_thankYouType == "Direct") {
+        memberName = MockData.currentUser.name;
+        businessName = MockData.currentUser.businessName;
+      } else if (_thankYouType == "Connect") {
+        final connectDetails = _thankYouConnectionController.text.trim();
+        if (connectDetails.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Please enter connection details!"),
+              backgroundColor: AppTheme.error,
+            ),
+          );
+          return;
+        }
+        memberName = MockData.currentUser.name;
+        businessName = connectDetails;
+      }
     }
 
     // Add mock note
@@ -103,11 +133,14 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
       memberName: memberName,
       businessName: businessName,
       amount: amount,
-      isGiven: _isGiven,
+      isReferral: _isGiven,
+      isGiven: true,
       date: DateTime.now().toString().split(" ")[0],
       attachmentName: null,
-      referralType: _isGiven ? _referralType : null,
-      referralPhone: _isGiven ? (_referralType == "Other" ? _referralPhoneController.text.trim() : MockData.currentUser.phone) : null,
+      referralType: _isGiven ? _referralType : _thankYouType,
+      referralPhone: _isGiven 
+          ? (_referralType == "Connect" ? _referralPhoneController.text.trim() : MockData.currentUser.phone) 
+          : MockData.currentUser.phone,
     );
 
     setState(() {
@@ -117,6 +150,8 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
       _referralNameController.clear();
       _referralPhoneController.clear();
       _referralBusinessController.clear();
+      _thankYouConnectionController.clear();
+      _selectedReferralMember = null;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -342,8 +377,8 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                           child: Text("Self", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         ),
                         DropdownMenuItem(
-                          value: "Other",
-                          child: Text("Other", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                          value: "Connect",
+                          child: Text("Connect", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         ),
                       ],
                       onChanged: (val) {
@@ -364,77 +399,114 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                  ] else ...[
+                    DropdownButtonFormField<String>(
+                      value: _thankYouType,
+                      items: const [
+                        DropdownMenuItem(
+                          value: "Member",
+                          child: Text("Member", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        ),
+                        DropdownMenuItem(
+                          value: "Direct",
+                          child: Text("Direct", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        ),
+                        DropdownMenuItem(
+                          value: "Connect",
+                          child: Text("Connect", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        setState(() {
+                          _thankYouType = val ?? "Member";
+                        });
+                      },
+                      icon: const Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
+                      decoration: InputDecoration(
+                        labelText: "Thank You Type",
+                        labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppTheme.border),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                   
                   // Search Input / Referral Details Inputs
                   if (!_isGiven) ...[
-                    TextField(
-                      controller: _partnerController,
-                      decoration: InputDecoration(
-                        hintText: "Search Name / Phone / Business",
-                        hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-                        prefixIcon: const Icon(Icons.person_search_outlined, color: AppTheme.textSecondary),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppTheme.border),
+                    // Connection Text Field for Connect Thank You type
+                    if (_thankYouType == "Connect") ...[
+                      TextField(
+                        controller: _thankYouConnectionController,
+                        decoration: InputDecoration(
+                          hintText: "Connection Name / Details",
+                          hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                          prefixIcon: const Icon(Icons.info_outline, color: AppTheme.textSecondary),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: AppTheme.border),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                  ] else if (_referralType == "Other") ...[
-                    // Referal Name
-                    TextField(
-                      controller: _referralNameController,
+                      const SizedBox(height: 12),
+                    ],
+                  ] else ...[
+                    // Members dropdown for Referral tab
+                    DropdownButtonFormField<String>(
+                      value: _selectedReferralMember,
+                      hint: const Text(
+                        "Select Member",
+                        style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+                      ),
+                      items: MockData.members
+                          .where((m) => m.name != MockData.currentUser.name)
+                          .map((m) {
+                        return DropdownMenuItem<String>(
+                          value: m.name,
+                          child: Text(m.name, style: const TextStyle(fontSize: 14)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          _selectedReferralMember = val;
+                        });
+                      },
+                      icon: const Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
                       decoration: InputDecoration(
-                        hintText: "Referal Name",
-                        hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-                        prefixIcon: const Icon(Icons.person_outline, color: AppTheme.textSecondary),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: AppTheme.border),
                         ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
                     ),
                     const SizedBox(height: 12),
 
-                    // Phone No
-                    TextField(
-                      controller: _referralPhoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        hintText: "Phone No",
-                        hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-                        prefixIcon: const Icon(Icons.phone_outlined, color: AppTheme.textSecondary),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppTheme.border),
+                    // Connection Text Field for Connect Referral type
+                    if (_referralType == "Connect") ...[
+                      TextField(
+                        controller: _referralNameController,
+                        decoration: InputDecoration(
+                          hintText: "Connection Name / Details",
+                          hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                          prefixIcon: const Icon(Icons.info_outline, color: AppTheme.textSecondary),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: AppTheme.border),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Business Name
-                    TextField(
-                      controller: _referralBusinessController,
-                      decoration: InputDecoration(
-                        hintText: "Business Name",
-                        hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-                        prefixIcon: const Icon(Icons.business_outlined, color: AppTheme.textSecondary),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppTheme.border),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
+                    ],
                   ],
                   // Business Amount Input
                   if (!_isGiven) ...[

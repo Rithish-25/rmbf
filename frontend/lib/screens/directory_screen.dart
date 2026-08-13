@@ -169,6 +169,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> with SingleTickerProv
               MemberAvatar(
                 name: member.name,
                 radius: 30,
+                profileImage: member.profileImage,
               ),
               const SizedBox(width: 16),
               // Member Info
@@ -472,6 +473,7 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
               child: MemberAvatar(
                 name: m.name,
                 radius: 45,
+                profileImage: m.profileImage,
               ),
             ),
 

@@ -5,6 +5,7 @@ import 'calendar_screen.dart';
 import 'news_events_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'thanks_note_history_screen.dart';
+import 'point_system_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onNavigateToThanks;
@@ -191,6 +192,58 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     final totalBusiness = totalGiven + totalTaken;
 
+    // R to R mock counts
+    const int totalRToRCount = 18;
+    const int thisTermRToRCount = 6;
+
+    // Points mock counts and dynamic colors based on point ranges:
+    // < 1000 -> grey
+    // 1000 to 3000 -> red
+    // 3000 to 6000 -> orange
+    // 6000 to 10000 -> green
+    final pointsStr = RegExp(r'\d+').stringMatch(user.nativeAddress) ?? '0';
+    final points = int.tryParse(pointsStr) ?? 0;
+
+    LinearGradient headerGradient;
+    Color headerPointsColor;
+    Color cardPointsColor;
+
+    if (points < 1000) {
+      headerGradient = const LinearGradient(
+        colors: [Color(0xFF374151), Color(0xFF4B5563)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+      headerPointsColor = Colors.grey.shade300;
+      cardPointsColor = Colors.grey.shade600;
+    } else if (points >= 1000 && points < 3000) {
+      headerGradient = const LinearGradient(
+        colors: [Color(0xFF991B1B), Color(0xFFDC2626)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+      headerPointsColor = Colors.red.shade200;
+      cardPointsColor = Colors.red.shade700;
+    } else if (points >= 3000 && points < 6000) {
+      headerGradient = const LinearGradient(
+        colors: [Color(0xFFE64A19), Color(0xFFFF5722)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+      headerPointsColor = Colors.orange.shade100;
+      cardPointsColor = Colors.deepOrange.shade700;
+    } else {
+      headerGradient = const LinearGradient(
+        colors: [Color(0xFF065F46), Color(0xFF059669)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+      headerPointsColor = Colors.green.shade200;
+      cardPointsColor = Colors.green.shade700;
+    }
+
+    const int currentMonthPoints = 1240;
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SingleChildScrollView(
@@ -200,17 +253,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             // Hero Profile Header
             Container(
-              decoration: const BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                gradient: headerGradient,
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0x331E3A8A),
+                    color: Colors.black.withOpacity(0.15),
                     blurRadius: 16,
-                    offset: Offset(0, 8),
+                    offset: const Offset(0, 8),
                   )
                 ],
               ),
@@ -224,6 +277,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                        MemberAvatar(
                         name: user.name,
                         radius: 40,
+                        profileImage: user.profileImage,
                       ),
                       const SizedBox(width: 16),
                       // Details
@@ -231,6 +285,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (user.powerMeetingName.isNotEmpty) ...[
+                              Text(
+                                user.powerMeetingName.toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.85),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                            ],
                             Text(
                               user.name,
                               style: const TextStyle(
@@ -239,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 fontSize: 22,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Row(
                               children: [
                                 const Icon(Icons.business, color: Colors.white70, size: 14),
@@ -254,6 +320,27 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 ),
                               ],
                             ),
+                            if (user.position.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.person_outline, color: Colors.white70, size: 14),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      user.position,
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -274,7 +361,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         Container(width: 1, height: 20, color: Colors.white24),
                         _buildQuickInfoItem(Icons.bloodtype, user.bloodGroup, color: Colors.redAccent),
                         Container(width: 1, height: 20, color: Colors.white24),
-                        _buildQuickInfoItem(Icons.stars, user.nativeAddress, color: AppTheme.secondary),
+                         _buildQuickInfoItem(
+                           Icons.stars,
+                           user.nativeAddress,
+                           color: headerPointsColor,
+                         ),
                       ],
                     ),
                   ),
@@ -297,17 +388,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildQuickActionBtn(
-                        icon: Icons.phone_in_talk_outlined,
-                        label: "Call",
-                        color: const Color(0xFFE0F2FE),
-                        iconColor: const Color(0xFF0284C7),
-                        onTap: () {},
-                      ),
                       _buildQuickActionBtn(
                         icon: Icons.calendar_month_outlined,
                         label: "Calendar",
@@ -342,7 +426,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             // Thanks Score Summary Card (Dashboard style)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Card(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -440,89 +537,370 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
             const SizedBox(height: 16),
 
-            // Business Generated Card (Alternative style, distinct structure)
+            // This Term Card
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Card(
-                shape: RoundedRectangleBorder(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: AppTheme.border, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
                 ),
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: AppTheme.softBlueGradient,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "TOTAL BUSINESS GENERATED",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.primary,
-                                letterSpacing: 0.5,
-                              ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEFF6FF),
+                              shape: BoxShape.circle,
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          "₹ ${_formatCurrency(totalBusiness)}",
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textPrimary,
+                            child: const Icon(
+                              Icons.handshake_outlined,
+                              color: AppTheme.primary,
+                              size: 20,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        // Custom premium progress/visual accent
-                        Stack(
-                          children: [
-                            Container(
-                              height: 8,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            "THIS TERM",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                              letterSpacing: 0.5,
                             ),
-                            FractionallySizedBox(
-                              widthFactor: 0.65, // simulated share
-                              child: Container(
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  gradient: AppTheme.goldGradient,
-                                  borderRadius: BorderRadius.circular(4),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "TOTAL GIVEN",
+                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                 ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "₹ ${_formatCurrency(totalGiven)}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.success,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 40,
+                            width: 1,
+                            color: AppTheme.border,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "TOTAL TAKEN",
+                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "₹ ${_formatCurrency(totalTaken)}",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.primary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Given Share: ${(totalGiven / (totalBusiness == 0 ? 1 : totalBusiness) * 100).toStringAsFixed(0)}%",
-                              style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
-                            ),
-                            Text(
-                              "Taken Share: ${(totalTaken / (totalBusiness == 0 ? 1 : totalBusiness) * 100).toStringAsFixed(0)}%",
-                              style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Updated in real-time",
+                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // R to R Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4),
                     ),
+                  ],
+                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEFF6FF),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.people_outline,
+                              color: AppTheme.primary,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            "R TO R",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "TOTAL COUNT",
+                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "$totalRToRCount",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 40,
+                            width: 1,
+                            color: AppTheme.border,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "THIS TERM",
+                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "$thisTermRToRCount",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.success,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Updated in real-time",
+                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Points Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEFF6FF),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.emoji_events_outlined,
+                              color: AppTheme.primary,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            "POINTS",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const Spacer(),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const PointSystemScreen()),
+                              );
+                            },
+                            child: const Text(
+                              "Know your point system",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.primary,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "TOTAL POINTS",
+                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "$points / 10000",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: cardPointsColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 40,
+                            width: 1,
+                            color: AppTheme.border,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "CURRENT MONTH",
+                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "$currentMonthPoints",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.success,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: points / 10000,
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor: AlwaysStoppedAnimation<Color>(cardPointsColor),
+                          minHeight: 6,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Updated in real-time",
+                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -563,7 +941,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

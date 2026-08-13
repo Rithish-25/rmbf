@@ -10,6 +10,9 @@ import 'screens/login_screen.dart';
 import 'screens/r_to_r_form_screen.dart';
 import 'screens/referral_list_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/apply_leave_screen.dart';
+import 'screens/point_system_screen.dart';
+import 'screens/attendance_bylaw_screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -235,7 +238,7 @@ class _MainShellState extends State<MainShell> {
         title: Text(_getAppBarTitle()),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: AppTheme.border, height: 1.0),
+          child: Container(color: Colors.white24, height: 1.0),
         ),
         leading: IconButton(
           icon: const Icon(Icons.menu),
@@ -243,7 +246,7 @@ class _MainShellState extends State<MainShell> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: AppTheme.primary),
+            icon: const Icon(Icons.notifications_none),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("No new notifications"), backgroundColor: AppTheme.primary),
@@ -277,6 +280,7 @@ class _MainShellState extends State<MainShell> {
                         MemberAvatar(
                           name: user.name,
                           radius: 30,
+                          profileImage: user.profileImage,
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -318,16 +322,22 @@ class _MainShellState extends State<MainShell> {
                       title: "Apply Leave",
                       onTap: () {
                         Navigator.pop(context);
-                        _showDrawerActionDialog("Apply Leave", const LeaveFormDialog());
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ApplyLeaveScreen()),
+                        );
                       },
                     ),
 
                     _buildDrawerItem(
                       icon: Icons.gavel_outlined,
-                      title: "RMBF By-Laws",
+                      title: "Attendance By-Law",
                       onTap: () {
                         Navigator.pop(context);
-                        _showDrawerActionDialog("RMBF By-Laws", const ByLawsDialog());
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const AttendanceByLawScreen()),
+                        );
                       },
                     ),
                     _buildDrawerItem(
@@ -342,13 +352,13 @@ class _MainShellState extends State<MainShell> {
                       },
                     ),
                     _buildDrawerItem(
-                      icon: Icons.description_outlined,
-                      title: "Referral",
+                      icon: Icons.emoji_events_outlined,
+                      title: "Point System",
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ReferralListScreen()),
+                          MaterialPageRoute(builder: (context) => const PointSystemScreen()),
                         );
                       },
                     ),
@@ -531,29 +541,6 @@ class _MainShellState extends State<MainShell> {
       ),
     );
   }
-
-
-  void _showDrawerActionDialog(String title, Widget body) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
-          ),
-          content: SingleChildScrollView(child: body),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Close", style: TextStyle(color: AppTheme.textSecondary)),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
 
 // Sub-widgets for Drawer actions dialog layouts
@@ -705,40 +692,6 @@ class _LeaveFormDialogState extends State<LeaveFormDialog> {
             padding: const EdgeInsets.symmetric(vertical: 12),
           ),
           child: const Text("Apply Leave", style: TextStyle(fontWeight: FontWeight.bold)),
-        ),
-      ],
-    );
-  }
-}
-
-
-
-class ByLawsDialog extends StatelessWidget {
-  const ByLawsDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "1. Attendance Policies",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.primary),
-        ),
-        SizedBox(height: 4),
-        Text(
-          "Members must maintain at least 80% attendance. Leave must be filed 24 hours prior via the app.",
-          style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-        ),
-        SizedBox(height: 12),
-        Text(
-          "2. Referral Integrity",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.primary),
-        ),
-        SizedBox(height: 4),
-        Text(
-          "All referrals passed must follow the G to G standard. Real-time updates required on thanks notes.",
-          style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
         ),
       ],
     );
