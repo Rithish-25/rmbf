@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -245,7 +246,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Profile Details Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Card(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(color: Colors.black.withOpacity(0.12)),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -270,6 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onSave: (v) => MockData.currentUser = MockData.currentUser.copyWith(phone: v),
                       ),
                     ),
+                    const Divider(height: 1, thickness: 0.8, color: AppTheme.border),
                     _buildInfoRow(
                       Icons.cake_outlined,
                       "Date of Birth",
@@ -280,6 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onSave: (v) => MockData.currentUser = MockData.currentUser.copyWith(dob: v),
                       ),
                     ),
+                    const Divider(height: 1, thickness: 0.8, color: AppTheme.border),
                     _buildInfoRow(
                       Icons.favorite_border,
                       "Wedding Day",
@@ -291,6 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onSave: (v) => MockData.currentUser = MockData.currentUser.copyWith(weddingDay: v),
                       ),
                     ),
+                    const Divider(height: 1, thickness: 0.8, color: AppTheme.border),
                     _buildInfoRow(
                       Icons.storefront_outlined,
                       "Company Open Day",
@@ -301,6 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onSave: (v) => MockData.currentUser = MockData.currentUser.copyWith(companyOpenDay: v),
                       ),
                     ),
+                    const Divider(height: 1, thickness: 0.8, color: AppTheme.border),
                     _buildInfoRow(
                       Icons.location_on_outlined,
                       "Office Address",
@@ -327,9 +345,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ElevatedButton.icon(
                   onPressed: widget.onLogout,
                   icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text(
-                    "Logout",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  label: Text(
+                    t("Logout"),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.error,
@@ -373,15 +391,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
-                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                  t(label),
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value.isEmpty ? "Not set" : value,
-                  style: TextStyle(
+                  style: GoogleFonts.outfit(
                     color: value.isEmpty ? AppTheme.textSecondary : AppTheme.textPrimary,
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

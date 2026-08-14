@@ -13,6 +13,7 @@ import 'screens/splash_screen.dart';
 import 'screens/apply_leave_screen.dart';
 import 'screens/point_system_screen.dart';
 import 'screens/attendance_bylaw_screen.dart';
+import 'language_service.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -142,22 +143,21 @@ class _MainShellState extends State<MainShell> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Navigation pages list
-  late final List<Widget> _pages;
+  List<Widget> get _pages => [
+    HomeScreen(onNavigateToThanks: () {
+      setState(() {
+        _currentIndex = 2; // Index of Thanks Note
+      });
+    }),
+    DirectoryScreen(),
+    ThanksNoteScreen(),
+    MeetingScreen(),
+    ProfileScreen(onLogout: widget.onLogout),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _pages = [
-      HomeScreen(onNavigateToThanks: () {
-        setState(() {
-          _currentIndex = 2; // Index of Thanks Note
-        });
-      }),
-      const DirectoryScreen(),
-      const ThanksNoteScreen(),
-      const MeetingScreen(),
-      ProfileScreen(onLogout: widget.onLogout),
-    ];
   }
 
   Future<bool?> _showExitConfirmationDialog() {
@@ -198,15 +198,15 @@ class _MainShellState extends State<MainShell> {
   String _getAppBarTitle() {
     switch (_currentIndex) {
       case 0:
-        return "RMBF Dashboard";
+        return t("RMBF Dashboard");
       case 1:
-        return "Member Directory";
+        return t("Member Directory");
       case 2:
-        return "Thanks Note Activity";
+        return t("Thanks Note Activity");
       case 3:
-        return "Meetings & Events";
+        return t("Meetings & Events");
       case 4:
-        return "My Member Profile";
+        return t("My Member Profile");
       default:
         return "Rmbf";
     }
@@ -216,271 +216,294 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final user = MockData.currentUser;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, Object? result) async {
-        if (didPop) return;
-        if (_currentIndex != 0) {
-          setState(() {
-            _currentIndex = 0;
-          });
-        } else {
-          final shouldExit = await _showExitConfirmationDialog();
-          if (shouldExit == true) {
-            SystemNavigator.pop();
-          }
-        }
-      },
-      child: Scaffold(
-        key: _scaffoldKey,
-        onDrawerChanged: (isOpened) => FocusManager.instance.primaryFocus?.unfocus(),
-      appBar: AppBar(
-        title: Text(_getAppBarTitle()),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: Colors.white24, height: 1.0),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("No new notifications"), backgroundColor: AppTheme.primary),
-              );
-            },
-          )
-        ],
-      ),
-      drawer: Drawer(
-        elevation: 16,
-        child: Container(
-          color: AppTheme.background,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Drawer Header with Dark Blue Gradient matching guidelines
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
+    return ListenableBuilder(
+      listenable: LanguageService.currentLanguage,
+      builder: (context, _) {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, Object? result) async {
+            if (didPop) return;
+            if (_currentIndex != 0) {
+              setState(() {
+                _currentIndex = 0;
+              });
+            } else {
+              final shouldExit = await _showExitConfirmationDialog();
+              if (shouldExit == true) {
+                SystemNavigator.pop();
+              }
+            }
+          },
+          child: Scaffold(
+            key: _scaffoldKey,
+            onDrawerChanged: (isOpened) => FocusManager.instance.primaryFocus?.unfocus(),
+            appBar: AppBar(
+              flexibleSpace: Container(
                 decoration: const BoxDecoration(
                   gradient: AppTheme.primaryGradient,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        MemberAvatar(
-                          name: user.name,
-                          radius: 30,
-                          profileImage: user.profileImage,
+              ),
+              title: Text(_getAppBarTitle()),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(1.0),
+                child: Container(color: Colors.white24, height: 1.0),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              ),
+              actions: [
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.translate, color: Colors.white),
+                  onSelected: (String lang) {
+                    LanguageService.currentLanguage.lang = lang;
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return ['English', 'Tamil'].map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(
+                          choice,
+                          style: TextStyle(
+                            fontWeight: LanguageService.currentLanguage.lang == choice
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      );
+                    }).toList();
+                  },
+                ),
+              ],
+            ),
+            drawer: Drawer(
+              elevation: 16,
+              child: Container(
+                color: AppTheme.background,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Drawer Header with Dark Blue Gradient matching guidelines
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
+                      decoration: const BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Text(
-                                user.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+                              MemberAvatar(
+                                name: user.name,
+                                radius: 30,
+                                profileImage: user.profileImage,
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                user.chapter,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user.name,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      user.chapter,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Navigation Items with Icons
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  children: [
-                    _buildDrawerItem(
-                      icon: Icons.calendar_today_outlined,
-                      title: "Apply Leave",
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ApplyLeaveScreen()),
-                        );
-                      },
-                    ),
+                    const SizedBox(height: 12),
+                    // Navigation Items with Icons
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        children: [
+                          _buildDrawerItem(
+                            icon: Icons.calendar_today_outlined,
+                            title: "Apply Leave",
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ApplyLeaveScreen()),
+                              );
+                            },
+                          ),
 
-                    _buildDrawerItem(
-                      icon: Icons.gavel_outlined,
-                      title: "Attendance By-Law",
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const AttendanceByLawScreen()),
-                        );
-                      },
+                          _buildDrawerItem(
+                            icon: Icons.gavel_outlined,
+                            title: "Attendance By-Law",
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AttendanceByLawScreen()),
+                              );
+                            },
+                          ),
+                          _buildDrawerItem(
+                            icon: Icons.handshake_outlined,
+                            title: "R to R Form",
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const RtoRFormScreen()),
+                              );
+                            },
+                          ),
+                          _buildDrawerItem(
+                            icon: Icons.emoji_events_outlined,
+                            title: "Point System",
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const PointSystemScreen()),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildDrawerItem(
-                      icon: Icons.handshake_outlined,
-                      title: "R to R Form",
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const RtoRFormScreen()),
-                        );
-                      },
-                    ),
-                    _buildDrawerItem(
-                      icon: Icons.emoji_events_outlined,
-                      title: "Point System",
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const PointSystemScreen()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              // Logout Area with distinct design (red button)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onLogout();
-                  },
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text(
-                    "Logout",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.error,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    elevation: 0,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      body: FadeIndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: Stack(
-        alignment: Alignment.topCenter,
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(28),
-                topRight: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildNavItem(0, Icons.home_outlined, Icons.home, "Home"),
-                    _buildNavItem(1, Icons.people_outline, Icons.people, "Directory"),
-                    GestureDetector(
-                      onTap: () => setState(() => _currentIndex = 2),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(height: 30), // Fixed height matching icon slot
-                            const SizedBox(height: 6),
-                            Text(
-                              "Thanks Note",
-                              style: TextStyle(
-                                color: _currentIndex == 2 ? AppTheme.primary : AppTheme.textSecondary,
-                                fontSize: 10,
-                                fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
-                              ),
-                            ),
-                          ],
+                    // Logout Area with distinct design (red button)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          widget.onLogout();
+                        },
+                        icon: const Icon(Icons.logout, color: Colors.white),
+                        label: Text(
+                          t("Logout"),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.error,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          elevation: 0,
                         ),
                       ),
                     ),
-                    _buildNavItem(3, Icons.business_center_outlined, Icons.business_center, "Meeting"),
-                    _buildNavItem(4, Icons.person_outline, Icons.person, "Profile"),
                   ],
                 ),
               ),
             ),
-          ),
-          
-          // Uplifted floating action button logo
-          Positioned(
-            top: -16, // uplifted by 16 pixels to float above curves
-            child: GestureDetector(
-              onTap: () => setState(() => _currentIndex = 2),
-              child: Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: _currentIndex == 2 ? AppTheme.goldGradient : AppTheme.primaryGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color: (_currentIndex == 2 ? AppTheme.secondary : AppTheme.primary).withOpacity(0.35),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+            body: FadeIndexedStack(
+              index: _currentIndex,
+              children: _pages,
+            ),
+            bottomNavigationBar: Stack(
+              alignment: Alignment.topCenter,
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
                     ),
-                  ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildNavItem(0, Icons.home_outlined, Icons.home, "Home"),
+                          _buildNavItem(1, Icons.people_outline, Icons.people, "Directory"),
+                          GestureDetector(
+                            onTap: () => setState(() => _currentIndex = 2),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(height: 30), // Fixed height matching icon slot
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    t("Thanks Note"),
+                                    style: TextStyle(
+                                      color: _currentIndex == 2 ? AppTheme.primary : AppTheme.textSecondary,
+                                      fontSize: 10,
+                                      fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          _buildNavItem(3, Icons.business_center_outlined, Icons.business_center, "Meeting"),
+                          _buildNavItem(4, Icons.person_outline, Icons.person, "Profile"),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.note_add,
-                  color: Colors.white,
-                  size: 24,
+                
+                // Uplifted floating action button logo
+                Positioned(
+                  top: -16, // uplifted by 16 pixels to float above curves
+                  child: GestureDetector(
+                    onTap: () => setState(() => _currentIndex = 2),
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: _currentIndex == 2 ? AppTheme.goldGradient : AppTheme.primaryGradient,
+                        boxShadow: [
+                          BoxShadow(
+                            color: (_currentIndex == 2 ? AppTheme.secondary : AppTheme.primary).withOpacity(0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.note_add,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
-      ),
-    ),
+        );
+      },
     );
   }
 
@@ -499,7 +522,7 @@ class _MainShellState extends State<MainShell> {
       child: ListTile(
         leading: Icon(icon, color: AppTheme.primary, size: 20),
         title: Text(
-          title,
+          t(title),
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary),
         ),
         trailing: const Icon(Icons.chevron_right, color: AppTheme.textSecondary, size: 16),
@@ -529,7 +552,7 @@ class _MainShellState extends State<MainShell> {
             ),
             const SizedBox(height: 6),
             Text(
-              label,
+              t(label),
               style: TextStyle(
                 color: color,
                 fontSize: 10,

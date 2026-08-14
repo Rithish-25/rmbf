@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 
 class ThanksNoteHistoryScreen extends StatefulWidget {
@@ -287,16 +288,12 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
       itemBuilder: (context, index) {
         final note = filteredNotes[index];
         
-        String cardLabel;
         Color labelColor;
         if (note.isReferral) {
-          cardLabel = "Referal";
           labelColor = AppTheme.primary;
         } else if (note.isGiven) {
-          cardLabel = "Given";
           labelColor = AppTheme.error;
         } else {
-          cardLabel = "Thanks Note";
           labelColor = AppTheme.success;
         }
 
@@ -305,19 +302,22 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
 
         if (note.isReferral) {
           if (note.referralType == "Self") {
-            titleText = MockData.currentUser.name;
-            subtitleText = note.businessName;
+            titleText = note.memberName;
+            subtitleText = t("Self");
+          } else if (note.referralType == "Connect") {
+            titleText = note.memberName;
+            subtitleText = "${t("Connect")}: ${note.businessName}";
           } else {
-            titleText = note.businessName;
-            subtitleText = "Referred to ${note.memberName}";
+            titleText = note.memberName;
+            subtitleText = note.businessName;
           }
         } else {
           if (note.referralType == "Connect") {
-            titleText = note.businessName;
-            subtitleText = "Received via ${note.memberName}";
+            titleText = note.memberName;
+            subtitleText = "${t("Connect")}: ${note.businessName}";
           } else if (note.referralType == "Direct") {
-            titleText = MockData.currentUser.name;
-            subtitleText = "Received from ${note.memberName}";
+            titleText = note.memberName;
+            subtitleText = t("Direct");
           } else {
             titleText = note.memberName;
             subtitleText = note.businessName;
@@ -354,9 +354,9 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                     ),
                   ),
                   Text(
-                    cardLabel,
+                    _formatCurrency(note.amount),
                     style: GoogleFonts.outfit(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: labelColor,
                     ),
@@ -376,35 +376,12 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        _formatDate(note.date),
-                        style: GoogleFonts.outfit(
-                          fontSize: 12,
-                          color: const Color(0xFF9CA3AF),
-                        ),
-                      ),
-                      if (note.amount > 0) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          "•",
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            color: const Color(0xFF9CA3AF),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _formatCurrency(note.amount),
-                          style: GoogleFonts.outfit(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primary,
-                          ),
-                        ),
-                      ],
-                    ],
+                  Text(
+                    _formatDate(note.date),
+                    style: GoogleFonts.outfit(
+                      fontSize: 12,
+                      color: const Color(0xFF9CA3AF),
+                    ),
                   ),
                   if (!note.isGiven && !note.isReferral)
                     Row(
@@ -456,6 +433,11 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
         title: const Text("Thanksnote History"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

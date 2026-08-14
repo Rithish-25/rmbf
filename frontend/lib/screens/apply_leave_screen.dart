@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
+import '../language_service.dart';
 
 class ScheduledMeeting {
   final String title;
@@ -79,7 +80,12 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Apply Leave"),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
+        title: Text(t("Apply Leave")),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -125,7 +131,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          meeting.type,
+                          t(meeting.type),
                           style: GoogleFonts.outfit(
                             color: AppTheme.primary,
                             fontSize: 10,
@@ -141,7 +147,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            "Leave Applied",
+                            t("Leave Applied"),
                             style: GoogleFonts.outfit(
                               color: AppTheme.success,
                               fontSize: 10,
@@ -153,7 +159,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    meeting.title,
+                    t(meeting.title),
                     style: GoogleFonts.outfit(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -177,7 +183,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
                       const Icon(Icons.access_time, size: 14, color: AppTheme.textSecondary),
                       const SizedBox(width: 8),
                       Text(
-                        meeting.time,
+                        t(meeting.time),
                         style: GoogleFonts.outfit(
                           fontSize: 13,
                           color: AppTheme.textSecondary,
@@ -205,7 +211,7 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
                         ),
                       ),
                       child: Text(
-                        meeting.isLeaveApplied ? "Cancel Leave" : "Apply Leave",
+                        t(meeting.isLeaveApplied ? "Cancel Leave" : "Apply Leave"),
                         style: GoogleFonts.outfit(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

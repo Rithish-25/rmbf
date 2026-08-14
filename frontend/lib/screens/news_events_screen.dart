@@ -172,6 +172,11 @@ class _NewsEventsScreenState extends State<NewsEventsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
         title: const Text("News & Events"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

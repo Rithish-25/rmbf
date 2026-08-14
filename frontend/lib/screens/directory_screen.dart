@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 
 class DirectoryScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> with SingleTickerProv
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: "Search by Name, Business, Phone...",
+                  hintText: t("Search by Name, Business, Phone..."),
                   prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
                   hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -137,14 +138,14 @@ class _DirectoryScreenState extends State<DirectoryScreen> with SingleTickerProv
         children: [
           Icon(Icons.search_off, size: 64, color: AppTheme.textSecondary.withOpacity(0.5)),
           const SizedBox(height: 16),
-          const Text(
-            "No members found",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+          Text(
+            t("No members found"),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
           ),
           const SizedBox(height: 6),
-          const Text(
-            "Try adjusting your search filters",
-            style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+          Text(
+            t("Try adjusting your search filters"),
+            style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
           ),
         ],
       ),
@@ -181,7 +182,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> with SingleTickerProv
                       children: [
                         Flexible(
                           child: Text(
-                            member.name,
+                            t(member.name),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -213,7 +214,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> with SingleTickerProv
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      member.businessName,
+                      t(member.businessName),
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppTheme.textSecondary,
@@ -336,7 +337,7 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
                   children: [
                     // Member Name
                     Text(
-                      m.name,
+                      t(m.name),
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -347,7 +348,7 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Kootam: ${m.kootam}",
+                      "${t("Kootam")}: ${t(m.kootam)}",
                       style: const TextStyle(
                         fontSize: 14,
                         color: AppTheme.textSecondary,
@@ -390,12 +391,15 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
                                       color: _isPersonal ? Colors.white : AppTheme.textSecondary,
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      "Personal",
-                                      style: TextStyle(
-                                        color: _isPersonal ? Colors.white : AppTheme.textSecondary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
+                                    Flexible(
+                                      child: Text(
+                                        t("Personal"),
+                                        style: TextStyle(
+                                          color: _isPersonal ? Colors.white : AppTheme.textSecondary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
@@ -425,12 +429,15 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
                                       color: !_isPersonal ? Colors.white : AppTheme.textSecondary,
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      "Business",
-                                      style: TextStyle(
-                                        color: !_isPersonal ? Colors.white : AppTheme.textSecondary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
+                                    Flexible(
+                                      child: Text(
+                                        t("Business"),
+                                        style: TextStyle(
+                                          color: !_isPersonal ? Colors.white : AppTheme.textSecondary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
@@ -542,11 +549,12 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
         border: Border(bottom: BorderSide(color: AppTheme.border, width: 0.8)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: iconColor, size: 20),
           const SizedBox(width: 12),
           Text(
-            label,
+            t(label),
             style: const TextStyle(
               fontSize: 14,
               color: AppTheme.textSecondary,
@@ -554,14 +562,17 @@ class _MemberDetailDialogState extends State<MemberDetailDialog> {
               decoration: TextDecoration.none,
             ),
           ),
-          const Spacer(),
-          Text(
-            value.isEmpty ? "N/A" : value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.w600,
-              decoration: TextDecoration.none,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              t(value.isEmpty ? "N/A" : value),
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none,
+              ),
             ),
           ),
         ],

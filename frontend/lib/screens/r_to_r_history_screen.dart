@@ -23,6 +23,11 @@ class RtoRHistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
         title: const Text("R to R History"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

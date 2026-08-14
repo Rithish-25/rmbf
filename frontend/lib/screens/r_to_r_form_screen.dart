@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 import 'r_to_r_history_screen.dart';
 
@@ -100,7 +101,12 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("R to R Form"),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
+        title: Text(t("R to R Form")),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -118,7 +124,7 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
           children: [
                       // Your Name field
                       Text(
-                        "Your Name",
+                        t("Your Name"),
                         style: GoogleFonts.outfit(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -148,7 +154,7 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
 
                       // Whom are you doing R to R with
                       Text(
-                        "Whom are you doing R to R with?",
+                        t("Whom are you doing R to R with?"),
                         style: GoogleFonts.outfit(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -159,13 +165,13 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
                       DropdownButtonFormField<String>(
                         value: _selectedMember,
                         hint: Text(
-                          "Select member",
+                          t("Select member"),
                           style: GoogleFonts.outfit(color: AppTheme.textSecondary, fontSize: 14),
                         ),
                         items: MockData.members.map((m) {
                           return DropdownMenuItem<String>(
                             value: m.name,
-                            child: Text(m.name, style: GoogleFonts.outfit(fontSize: 14)),
+                            child: Text(t(m.name), style: GoogleFonts.outfit(fontSize: 14)),
                           );
                         }).toList(),
                         onChanged: (val) {
@@ -190,7 +196,7 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
 
                       // Your R to R Date
                       Text(
-                        "Your R to R Date",
+                        t("Your R to R Date"),
                         style: GoogleFonts.outfit(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -205,7 +211,7 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
                             controller: _dateController,
                             style: GoogleFonts.outfit(fontSize: 14),
                             decoration: InputDecoration(
-                              hintText: "Select date",
+                              hintText: t("Select date"),
                               hintStyle: GoogleFonts.outfit(color: AppTheme.textSecondary, fontSize: 14),
                               suffixIcon: const Icon(Icons.calendar_today, color: AppTheme.primary, size: 20),
                               border: OutlineInputBorder(
@@ -238,7 +244,7 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
                             elevation: 0,
                           ),
                           child: Text(
-                            "Submit R to R",
+                            t("Submit R to R"),
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -247,26 +253,31 @@ class _RtoRFormScreenState extends State<RtoRFormScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      TextButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const RtoRHistoryScreen()),
-                          );
-                        },
-                        icon: const Icon(Icons.history, color: AppTheme.primary),
-                        label: Text(
-                          "View History",
-                          style: GoogleFonts.outfit(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primary,
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const RtoRHistoryScreen()),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.visibility_outlined,
+                            size: 18,
                           ),
-                        ),
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          label: Text(
+                            t("View History"),
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.primary,
+                            side: const BorderSide(color: AppTheme.primary),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
                         ),
                       ),
           ],

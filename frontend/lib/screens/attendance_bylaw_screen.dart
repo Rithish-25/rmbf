@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../language_service.dart';
 
 class AttendanceByLawScreen extends StatelessWidget {
   const AttendanceByLawScreen({super.key});
@@ -20,7 +21,12 @@ class AttendanceByLawScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Attendance By-Law"),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
+        title: Text(t("Attendance By-Law")),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -50,9 +56,9 @@ class AttendanceByLawScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Attendance By-Law Rules",
-                style: TextStyle(
+              Text(
+                t("Attendance By-Law Rules"),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
@@ -132,7 +138,7 @@ class _RuleRow extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   child: Text(
-                    rule,
+                    t(rule),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
@@ -147,7 +153,7 @@ class _RuleRow extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   child: Text(
-                    detail,
+                    t(detail),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
@@ -164,7 +170,7 @@ class _RuleRow extends StatelessWidget {
               color: const Color(0xFFF9FAFB),
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
               child: Text(
-                note!,
+                t(note!),
                 style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
               ),
             ),

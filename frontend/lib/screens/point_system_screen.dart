@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../language_service.dart';
 
 class PointSystemScreen extends StatelessWidget {
   const PointSystemScreen({super.key});
@@ -22,7 +23,12 @@ class PointSystemScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text("Point System"),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
+        title: Text(t("Point System")),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -52,9 +58,9 @@ class PointSystemScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Points & Attendance Rules",
-                style: TextStyle(
+              Text(
+                t("Points & Attendance Rules"),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
@@ -108,7 +114,7 @@ class _HeaderCell extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Text(
-        text,
+        t(text),
         textAlign: alignEnd ? TextAlign.right : TextAlign.left,
         style: const TextStyle(
           fontSize: 13,
@@ -131,7 +137,7 @@ class _DataCell extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Text(
-        text,
+        t(text),
         textAlign: alignEnd ? TextAlign.right : TextAlign.left,
         style: TextStyle(fontSize: 13, color: color),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 import 'calendar_screen.dart';
 import 'news_events_screen.dart';
@@ -363,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         Container(width: 1, height: 20, color: Colors.white24),
                          _buildQuickInfoItem(
                            Icons.stars,
-                           user.nativeAddress,
+                           t(user.nativeAddress),
                            color: headerPointsColor,
                          ),
                       ],
@@ -380,23 +381,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Quick Services",
-                    style: TextStyle(
-                      fontSize: 16,
+                  Text(
+                    t("Quick Services"),
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
+                  Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
+                  const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildQuickActionBtn(
-                        icon: Icons.calendar_month_outlined,
+                        imagePath: "assets/calendar.png",
                         label: "Calendar",
-                        color: const Color(0xFFFEF3C7),
-                        iconColor: const Color(0xFFD97706),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -405,10 +406,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         },
                       ),
                        _buildQuickActionBtn(
-                        icon: Icons.newspaper_outlined,
+                        imagePath: "assets/event.png",
                         label: "News & Events",
-                        color: const Color(0xFFDCFCE7),
-                        iconColor: const Color(0xFF16A34A),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -422,6 +421,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             const SizedBox(height: 24),
+            Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
+            const SizedBox(height: 24),
 
             // Thanks Score Summary Card (Dashboard style)
             Padding(
@@ -432,13 +433,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
                       spreadRadius: 1,
                       offset: const Offset(0, 4),
                     ),
                   ],
-                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                  border: Border.all(color: Colors.black.withOpacity(0.12)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -459,10 +460,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            "THANKS SCORE SUMMARY",
-                            style: TextStyle(
-                              fontSize: 14,
+                          Text(
+                            t("THANKS SCORE SUMMARY"),
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textPrimary,
                               letterSpacing: 0.5,
@@ -470,7 +471,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+                      Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
@@ -526,15 +529,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       const SizedBox(height: 16),
                       const Divider(height: 1),
                       const SizedBox(height: 12),
-                      const Text(
-                        "Updated in real-time",
-                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      Text(
+                        t("Updated in real-time"),
+                        style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
             const SizedBox(height: 16),
 
             // This Term Card
@@ -546,13 +551,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
                       spreadRadius: 1,
                       offset: const Offset(0, 4),
                     ),
                   ],
-                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                  border: Border.all(color: Colors.black.withOpacity(0.12)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -573,10 +578,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            "THIS TERM",
-                            style: TextStyle(
-                              fontSize: 14,
+                          Text(
+                            t("THIS TERM"),
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textPrimary,
                               letterSpacing: 0.5,
@@ -584,7 +589,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+                      Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
@@ -640,15 +647,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       const SizedBox(height: 16),
                       const Divider(height: 1),
                       const SizedBox(height: 12),
-                      const Text(
-                        "Updated in real-time",
-                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      Text(
+                        t("Updated in real-time"),
+                        style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
             const SizedBox(height: 16),
 
             // R to R Card
@@ -660,13 +669,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
                       spreadRadius: 1,
                       offset: const Offset(0, 4),
                     ),
                   ],
-                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                  border: Border.all(color: Colors.black.withOpacity(0.12)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -687,10 +696,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            "R TO R",
-                            style: TextStyle(
-                              fontSize: 14,
+                          Text(
+                            t("R TO R"),
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textPrimary,
                               letterSpacing: 0.5,
@@ -698,16 +707,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+                      Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "TOTAL COUNT",
-                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                Text(
+                                  t("TOTAL COUNT"),
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -732,9 +743,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    "THIS TERM",
-                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  Text(
+                                    t("THIS TERM"),
+                                    style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -754,15 +765,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       const SizedBox(height: 16),
                       const Divider(height: 1),
                       const SizedBox(height: 12),
-                      const Text(
-                        "Updated in real-time",
-                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      Text(
+                        t("Updated in real-time"),
+                        style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
             const SizedBox(height: 16),
 
             // Points Card
@@ -774,13 +787,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
                       spreadRadius: 1,
                       offset: const Offset(0, 4),
                     ),
                   ],
-                  border: Border.all(color: AppTheme.border.withOpacity(0.5)),
+                  border: Border.all(color: Colors.black.withOpacity(0.12)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -801,45 +814,50 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            "POINTS",
-                            style: TextStyle(
-                              fontSize: 14,
+                          Text(
+                            t("POINTS"),
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textPrimary,
                               letterSpacing: 0.5,
                             ),
                           ),
-                          const Spacer(),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const PointSystemScreen()),
-                              );
-                            },
-                            child: const Text(
-                              "Know your point system",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.primary,
-                                decoration: TextDecoration.underline,
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PointSystemScreen()),
+                                );
+                              },
+                              child: Text(
+                                t("Know your point system"),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.primary,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                textAlign: TextAlign.end,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
+                      Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.06)),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "TOTAL POINTS",
-                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                Text(
+                                  t("TOTAL POINTS"),
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -864,9 +882,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    "CURRENT MONTH",
-                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  Text(
+                                    t("CURRENT MONTH"),
+                                    style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -896,9 +914,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       const SizedBox(height: 16),
                       const Divider(height: 1),
                       const SizedBox(height: 12),
-                      const Text(
-                        "Updated in real-time",
-                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                      Text(
+                        t("Updated in real-time"),
+                        style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                       ),
                     ],
                   ),
@@ -927,10 +945,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildQuickActionBtn({
-    required IconData icon,
+    required String imagePath,
     required String label,
-    required Color color,
-    required Color iconColor,
     required VoidCallback onTap,
   }) {
     return Expanded(
@@ -945,19 +961,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: iconColor, size: 24),
+                Image.asset(
+                  imagePath,
+                  width: 52,
+                  height: 52,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: GoogleFonts.outfit(
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.textPrimary,
                   ),

@@ -41,6 +41,11 @@ class _ReferralListScreenState extends State<ReferralListScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+          ),
+        ),
         title: Text(
           "Referrals",
           style: GoogleFonts.outfit(fontWeight: FontWeight.bold),

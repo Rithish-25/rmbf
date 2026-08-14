@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 import 'thanks_note_history_screen.dart';
 
@@ -23,7 +24,8 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
   final _referralBusinessController = TextEditingController();
 
   // Thank You specific controllers and states
-  String _thankYouType = "Member";
+  String _thankYouType = "Direct";
+  String? _selectedThankYouMember;
   final _thankYouConnectionController = TextEditingController();
 
   bool _isGiven = true;
@@ -104,13 +106,24 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
         businessName = targetMember.businessName;
       }
     } else {
-      if (_thankYouType == "Member") {
-        final targetMember = MockData.members.isNotEmpty ? MockData.members.first : MockData.currentUser;
+      if (_selectedThankYouMember == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please select a member!"),
+            backgroundColor: AppTheme.error,
+          ),
+        );
+        return;
+      }
+
+      final targetMember = MockData.members.firstWhere(
+        (m) => m.name == _selectedThankYouMember,
+        orElse: () => MockData.members.first,
+      );
+
+      if (_thankYouType == "Direct") {
         memberName = targetMember.name;
         businessName = targetMember.businessName;
-      } else if (_thankYouType == "Direct") {
-        memberName = MockData.currentUser.name;
-        businessName = MockData.currentUser.businessName;
       } else if (_thankYouType == "Connect") {
         final connectDetails = _thankYouConnectionController.text.trim();
         if (connectDetails.isEmpty) {
@@ -122,7 +135,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
           );
           return;
         }
-        memberName = MockData.currentUser.name;
+        memberName = targetMember.name;
         businessName = connectDetails;
       }
     }
@@ -152,6 +165,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
       _referralBusinessController.clear();
       _thankYouConnectionController.clear();
       _selectedReferralMember = null;
+      _selectedThankYouMember = null;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -190,10 +204,19 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Financial Totals Header Card
-          Card(
-            shape: RoundedRectangleBorder(
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: AppTheme.border, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(color: Colors.black.withOpacity(0.12)),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -202,14 +225,17 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.credit_card, color: AppTheme.success, size: 18),
-                            SizedBox(width: 6),
-                            Text(
-                              "Total Given",
-                              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                            const Icon(Icons.credit_card, color: AppTheme.success, size: 18),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                t("Total Given"),
+                                style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),
@@ -230,14 +256,17 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.receipt_long, color: AppTheme.primary, size: 18),
-                            SizedBox(width: 6),
-                            Text(
-                              "Total Taken",
-                              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                            const Icon(Icons.receipt_long, color: AppTheme.primary, size: 18),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                t("Total Taken"),
+                                style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),
@@ -261,15 +290,28 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
           const SizedBox(height: 20),
 
           // Add Thanks Note Form
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(color: Colors.black.withOpacity(0.12)),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    "Add Thanksnote",
-                    style: TextStyle(
+                  Text(
+                    t("Add Thanksnote"),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textPrimary,
@@ -323,7 +365,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        "Referal",
+                                        t("Referal"),
                                         style: TextStyle(
                                           color: _isGiven ? Colors.white : AppTheme.textSecondary,
                                           fontWeight: FontWeight.bold,
@@ -350,7 +392,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        "Thank You note",
+                                        t("Thank You note"),
                                         style: TextStyle(
                                           color: !_isGiven ? Colors.white : AppTheme.textSecondary,
                                           fontWeight: FontWeight.bold,
@@ -371,14 +413,14 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                   if (_isGiven) ...[
                     DropdownButtonFormField<String>(
                       value: _referralType,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: "Self",
-                          child: Text("Self", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                          child: Text(t("Self"), style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         ),
                         DropdownMenuItem(
                           value: "Connect",
-                          child: Text("Connect", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                          child: Text(t("Connect"), style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         ),
                       ],
                       onChanged: (val) {
@@ -388,7 +430,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                       },
                       icon: const Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
                       decoration: InputDecoration(
-                        labelText: "Referral Type",
+                        labelText: t("Referral Type"),
                         labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                         contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -400,30 +442,57 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                     ),
                     const SizedBox(height: 16),
                   ] else ...[
+                    // Members dropdown for Thank You note tab
                     DropdownButtonFormField<String>(
-                      value: _thankYouType,
-                      items: const [
-                        DropdownMenuItem(
-                          value: "Member",
-                          child: Text("Member", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
-                        ),
-                        DropdownMenuItem(
-                          value: "Direct",
-                          child: Text("Direct", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
-                        ),
-                        DropdownMenuItem(
-                          value: "Connect",
-                          child: Text("Connect", style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
-                        ),
-                      ],
+                      value: _selectedThankYouMember,
+                      hint: Text(
+                        t("Select Member"),
+                        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+                      ),
+                      items: MockData.members
+                          .where((m) => m.name != MockData.currentUser.name)
+                          .map((m) {
+                        return DropdownMenuItem<String>(
+                          value: m.name,
+                          child: Text(t(m.name), style: const TextStyle(fontSize: 14)),
+                        );
+                      }).toList(),
                       onChanged: (val) {
                         setState(() {
-                          _thankYouType = val ?? "Member";
+                          _selectedThankYouMember = val;
                         });
                       },
                       icon: const Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
                       decoration: InputDecoration(
-                        labelText: "Thank You Type",
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppTheme.border),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _thankYouType,
+                      items: [
+                        DropdownMenuItem(
+                          value: "Direct",
+                          child: Text(t("Direct"), style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        ),
+                        DropdownMenuItem(
+                          value: "Connect",
+                          child: Text(t("Connect"), style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        setState(() {
+                          _thankYouType = val ?? "Direct";
+                        });
+                      },
+                      icon: const Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
+                      decoration: InputDecoration(
+                        labelText: t("Thank You Type"),
                         labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                         contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -443,7 +512,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                       TextField(
                         controller: _thankYouConnectionController,
                         decoration: InputDecoration(
-                          hintText: "Connection Name / Details",
+                          hintText: t("Connection Name / Details"),
                           hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                           prefixIcon: const Icon(Icons.info_outline, color: AppTheme.textSecondary),
                           contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -460,16 +529,16 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                     // Members dropdown for Referral tab
                     DropdownButtonFormField<String>(
                       value: _selectedReferralMember,
-                      hint: const Text(
-                        "Select Member",
-                        style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+                      hint: Text(
+                        t("Select Member"),
+                        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
                       ),
                       items: MockData.members
                           .where((m) => m.name != MockData.currentUser.name)
                           .map((m) {
                         return DropdownMenuItem<String>(
                           value: m.name,
-                          child: Text(m.name, style: const TextStyle(fontSize: 14)),
+                          child: Text(t(m.name), style: const TextStyle(fontSize: 14)),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -494,7 +563,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                       TextField(
                         controller: _referralNameController,
                         decoration: InputDecoration(
-                          hintText: "Connection Name / Details",
+                          hintText: t("Connection Name / Details"),
                           hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                           prefixIcon: const Icon(Icons.info_outline, color: AppTheme.textSecondary),
                           contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -514,7 +583,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                       controller: _amountController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        hintText: "Business Amount (₹)",
+                        hintText: t("Business Amount (₹)"),
                         hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                         prefixIcon: const Icon(Icons.currency_rupee, color: AppTheme.textSecondary),
                         contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -539,7 +608,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
                       elevation: 1,
                     ),
                     child: Text(
-                      _isGiven ? "Submit Referal" : "Submit Thanksnote",
+                      t(_isGiven ? "Submit Referal" : "Submit Thanksnote"),
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -547,6 +616,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
           // View History button
           OutlinedButton.icon(
             onPressed: () {
@@ -562,7 +632,7 @@ class _ThanksNoteScreenState extends State<ThanksNoteScreen> {
               Icons.visibility_outlined,
               size: 18,
             ),
-            label: const Text("View Thanksnote History"),
+            label: Text(t("View Thanksnote History")),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.primary,
               side: const BorderSide(color: AppTheme.primary),

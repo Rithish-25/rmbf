@@ -276,7 +276,7 @@ class MockData {
       isReferral: true,
       isGiven: true,
       date: "2026-08-09",
-      referralType: "Other",
+      referralType: "Self",
       referralPhone: "8508003335",
     ),
     ThanksNote(
@@ -287,7 +287,7 @@ class MockData {
       isReferral: true,
       isGiven: true,
       date: "2026-08-05",
-      referralType: "Other",
+      referralType: "Connect",
       referralPhone: "9944221155",
     ),
     ThanksNote(
@@ -298,6 +298,7 @@ class MockData {
       isReferral: false,
       isGiven: false,
       date: "2026-08-04",
+      referralType: "Direct",
     ),
     ThanksNote(
       id: "TXN104",
@@ -307,6 +308,7 @@ class MockData {
       isReferral: false,
       isGiven: false,
       date: "2026-07-28",
+      referralType: "Connect",
     ),
   ];
 

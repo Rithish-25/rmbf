@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../theme.dart';
+import '../language_service.dart';
 import '../models.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MeetingScreen extends StatefulWidget {
   const MeetingScreen({super.key});
@@ -146,10 +148,10 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Section 1: Regular Meetings
-              const Text(
-                "Regular Meeting",
-                style: TextStyle(
-                  fontSize: 15,
+              Text(
+                t("Regular Meeting"),
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
                 ),
@@ -161,12 +163,13 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
-                      blurRadius: 16,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
                       spreadRadius: 1,
-                      offset: const Offset(0, 6),
+                      offset: const Offset(0, 4),
                     ),
                   ],
+                  border: Border.all(color: Colors.black.withOpacity(0.12)),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -184,12 +187,12 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withOpacity(0.06),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),
                               ],
-                              border: Border.all(color: AppTheme.border.withOpacity(0.4)),
+                              border: Border.all(color: Colors.black.withOpacity(0.08)),
                             ),
                             child: Center(
                               child: AnimatedBuilder(
@@ -319,13 +322,15 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                 ),
               ),
 
-              const SizedBox(height: 24), // Balanced section spacing
+              const SizedBox(height: 24),
+              Divider(height: 1, thickness: 1, color: Colors.black.withOpacity(0.08)),
+              const SizedBox(height: 24),
 
               // Section 2: Power Meeting
-              const Text(
-                "Power Team Meeting",
-                style: TextStyle(
-                  fontSize: 15,
+              Text(
+                t("Power Team Meeting"),
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
                 ),
@@ -337,12 +342,13 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
-                      blurRadius: 16,
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
                       spreadRadius: 1,
-                      offset: const Offset(0, 6),
+                      offset: const Offset(0, 4),
                     ),
                   ],
+                  border: Border.all(color: Colors.black.withOpacity(0.12)),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -360,12 +366,12 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withOpacity(0.06),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),
                               ],
-                              border: Border.all(color: AppTheme.border.withOpacity(0.4)),
+                              border: Border.all(color: Colors.black.withOpacity(0.08)),
                             ),
                             child: Center(
                               child: AnimatedBuilder(
@@ -514,12 +520,12 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
           borderRadius: BorderRadius.circular(10), // Clean rounding
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(color: AppTheme.border.withOpacity(0.4)),
+          border: Border.all(color: Colors.black.withOpacity(0.08)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), // Compact padding to prevent overflow
         child: Row(
@@ -539,7 +545,7 @@ class _MeetingScreenState extends State<MeetingScreen> with TickerProviderStateM
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    label,
+                    t(label),
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppTheme.textSecondary,
