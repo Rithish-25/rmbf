@@ -132,6 +132,10 @@ class LanguageService {
     'TOTAL TAKEN': 'மொத்தம் பெற்றது',
     'TOTAL COUNT': 'மொத்த எண்ணிக்கை',
     'THIS TERM': 'இந்த முறை',
+    'Font Size': 'எழுத்து அளவு',
+    'Increase Font': 'எழுத்தை பெரிதாக்கு',
+    'Decrease Font': 'எழுத்தை சிறிதாக்கு',
+    'Reset to Default': 'இயல்பு நிலைக்கு மீட்டமை',
   };
 
   static String translate(String key) {

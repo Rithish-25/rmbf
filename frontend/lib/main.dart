@@ -25,6 +25,9 @@ void main() {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  // Global notifier for text scale factor
+  static final ValueNotifier<double> textScaleFactor = ValueNotifier<double>(1.0);
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -111,21 +114,34 @@ class _MyAppState extends State<MyApp> {
       );
     }
 
-    return MaterialApp(
-      title: 'Rmbf',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: _isLoggedIn
-          ? MainShell(
-              onLogout: () {
-                _setLoginStatus(false);
-              },
-            )
-          : LoginScreen(
-              onLoginSuccess: () {
-                _setLoginStatus(true);
-              },
-            ),
+    return ValueListenableBuilder<double>(
+      valueListenable: MyApp.textScaleFactor,
+      builder: (context, scale, child) {
+        return MaterialApp(
+          title: 'Rmbf',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(scale),
+              ),
+              child: child!,
+            );
+          },
+          home: _isLoggedIn
+              ? MainShell(
+                  onLogout: () {
+                    _setLoginStatus(false);
+                  },
+                )
+              : LoginScreen(
+                  onLoginSuccess: () {
+                    _setLoginStatus(true);
+                  },
+                ),
+        );
+      },
     );
   }
 }
@@ -253,6 +269,73 @@ class _MainShellState extends State<MainShell> {
                 onPressed: () => _scaffoldKey.currentState?.openDrawer(),
               ),
               actions: [
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.format_size, color: Colors.white),
+                  tooltip: 'Font Size',
+                  onSelected: (String action) {
+                    double current = MyApp.textScaleFactor.value;
+                    if (action == 'increase') {
+                      if (current < 1.4) {
+                        MyApp.textScaleFactor.value = double.parse((current + 0.1).toStringAsFixed(1));
+                      }
+                    } else if (action == 'decrease') {
+                      if (current > 0.8) {
+                        MyApp.textScaleFactor.value = double.parse((current - 0.1).toStringAsFixed(1));
+                      }
+                    } else if (action == 'reset') {
+                      MyApp.textScaleFactor.value = 1.0;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    final int percentage = (MyApp.textScaleFactor.value * 100).round();
+                    return [
+                      PopupMenuItem<String>(
+                        enabled: false,
+                        child: Text(
+                          "${t("Font Size")}: $percentage%",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<String>(
+                        value: 'increase',
+                        enabled: MyApp.textScaleFactor.value < 1.4,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.zoom_in, size: 20, color: AppTheme.textSecondary),
+                            const SizedBox(width: 8),
+                            Text(t("Increase Font")),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'decrease',
+                        enabled: MyApp.textScaleFactor.value > 0.8,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.zoom_out, size: 20, color: AppTheme.textSecondary),
+                            const SizedBox(width: 8),
+                            Text(t("Decrease Font")),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'reset',
+                        enabled: MyApp.textScaleFactor.value != 1.0,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.restart_alt, size: 20, color: AppTheme.textSecondary),
+                            const SizedBox(width: 8),
+                            Text(t("Reset to Default")),
+                          ],
+                        ),
+                      ),
+                    ];
+                  },
+                ),
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.translate, color: Colors.white),
                   onSelected: (String lang) {
