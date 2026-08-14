@@ -70,8 +70,8 @@ class PointSystemScreen extends StatelessWidget {
               Table(
                 border: TableBorder.all(color: AppTheme.border, width: 1),
                 columnWidths: const {
-                  0: FlexColumnWidth(3),
-                  1: FlexColumnWidth(1),
+                  0: FlexColumnWidth(2.2),
+                  1: FlexColumnWidth(1.2),
                 },
                 children: [
                   const TableRow(
@@ -112,10 +112,10 @@ class _HeaderCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       child: Text(
         t(text),
-        textAlign: alignEnd ? TextAlign.right : TextAlign.left,
+        textAlign: alignEnd ? TextAlign.center : TextAlign.left,
         style: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.bold,
@@ -135,10 +135,10 @@ class _DataCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       child: Text(
         t(text),
-        textAlign: alignEnd ? TextAlign.right : TextAlign.left,
+        textAlign: alignEnd ? TextAlign.center : TextAlign.left,
         style: TextStyle(fontSize: 13, color: color),
       ),
     );

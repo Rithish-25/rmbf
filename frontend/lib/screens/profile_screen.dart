@@ -382,6 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               color: AppTheme.background,
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.border, width: 1),
             ),
             child: Icon(icon, color: iconColor, size: 18),
           ),

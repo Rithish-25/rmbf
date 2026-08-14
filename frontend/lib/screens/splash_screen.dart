@@ -35,8 +35,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
-          child: SizedBox(
-            width: 250,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Image.asset(
               'assets/splash.jpeg',
               fit: BoxFit.contain,
