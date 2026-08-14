@@ -534,27 +534,44 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildNavItem(int index, IconData outlineIcon, IconData solidIcon, String label) {
     final isSelected = _currentIndex == index;
-    final color = isSelected ? AppTheme.primary : AppTheme.textSecondary;
 
-    return InkWell(
+    return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: isSelected ? AppTheme.primaryGradient : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primary.withOpacity(0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               height: 30, // Fixed height for icon slot to push text down
               child: Center(
-                child: Icon(isSelected ? solidIcon : outlineIcon, color: color, size: 24),
+                child: Icon(
+                  isSelected ? solidIcon : outlineIcon,
+                  color: isSelected ? Colors.white : AppTheme.textSecondary,
+                  size: 24,
+                ),
               ),
             ),
             const SizedBox(height: 6),
             Text(
               t(label),
               style: TextStyle(
-                color: color,
+                color: isSelected ? Colors.white : AppTheme.textSecondary,
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),

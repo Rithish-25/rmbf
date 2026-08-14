@@ -449,9 +449,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEFF6FF),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
                               shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFFBFDBFE), width: 1),
                             ),
                             child: const Icon(
                               Icons.handshake_outlined,
@@ -567,9 +568,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEFF6FF),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
                               shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFFBFDBFE), width: 1),
                             ),
                             child: const Icon(
                               Icons.handshake_outlined,
@@ -685,9 +687,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEFF6FF),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
                               shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFFBFDBFE), width: 1),
                             ),
                             child: const Icon(
                               Icons.people_outline,
@@ -803,9 +806,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEFF6FF),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
                               shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFFBFDBFE), width: 1),
                             ),
                             child: const Icon(
                               Icons.emoji_events_outlined,
@@ -963,8 +967,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               children: [
                 Image.asset(
                   imagePath,
-                  width: 52,
-                  height: 52,
+                  width: 42,
+                  height: 42,
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 10),

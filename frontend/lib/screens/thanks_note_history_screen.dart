@@ -354,7 +354,7 @@ class _ThanksNoteHistoryScreenState extends State<ThanksNoteHistoryScreen> {
                     ),
                   ),
                   Text(
-                    _formatCurrency(note.amount),
+                    note.isReferral ? t("Referal") : _formatCurrency(note.amount),
                     style: GoogleFonts.outfit(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
