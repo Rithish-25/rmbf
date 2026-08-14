@@ -63,8 +63,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required ValueChanged<String> onSave,
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
+    String? Function(String?)? validator,
   }) async {
     final controller = TextEditingController(text: currentValue);
+    final formKey = GlobalKey<FormState>();
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -73,18 +75,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "Edit $label",
           style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
         ),
-        content: TextField(
-          controller: controller,
-          keyboardType: maxLines > 1 ? TextInputType.multiline : keyboardType,
-          autofocus: true,
-          minLines: maxLines,
-          maxLines: maxLines,
-          textAlignVertical: TextAlignVertical.top,
-          style: const TextStyle(fontSize: 16),
-          decoration: InputDecoration(
-            hintText: "Enter $label",
-            contentPadding: const EdgeInsets.all(16),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            keyboardType: maxLines > 1 ? TextInputType.multiline : keyboardType,
+            maxLength: label == "Mobile Number" ? 10 : null,
+            autofocus: true,
+            minLines: maxLines,
+            maxLines: maxLines,
+            textAlignVertical: TextAlignVertical.top,
+            style: const TextStyle(fontSize: 16),
+            decoration: InputDecoration(
+              hintText: "Enter $label",
+              counterText: "",
+              contentPadding: const EdgeInsets.all(16),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              errorMaxLines: 2,
+            ),
+            validator: validator,
           ),
         ),
         actions: [
@@ -93,7 +102,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: const Text("Cancel", style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(context, controller.text.trim());
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
@@ -245,6 +258,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: "Mobile Number",
                         currentValue: user.phone,
                         keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Mobile number cannot be empty";
+                          }
+                          if (!RegExp(r'^[1-9]\d{9}$').hasMatch(value.trim())) {
+                            return "10 digits only, cannot start with 0";
+                          }
+                          return null;
+                        },
                         onSave: (v) => MockData.currentUser = MockData.currentUser.copyWith(phone: v),
                       ),
                     ),

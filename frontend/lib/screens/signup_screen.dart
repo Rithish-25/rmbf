@@ -170,13 +170,14 @@ class _SignupScreenState extends State<SignupScreen> {
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(color: AppTheme.border),
                             ),
+                            errorMaxLines: 2,
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return "Phone number cannot be empty";
                             }
-                            if (!RegExp(r'^\d{10}$').hasMatch(value.trim())) {
-                              return "Please enter a valid 10-digit number";
+                            if (!RegExp(r'^[1-9]\d{9}$').hasMatch(value.trim())) {
+                              return "10 digits only, cannot start with 0";
                             }
                             return null;
                           },

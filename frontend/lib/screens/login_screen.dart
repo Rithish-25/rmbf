@@ -35,11 +35,11 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Basic 10-digit validation
-    final phoneRegex = RegExp(r'^\d{10}$');
+    // Basic 10-digit validation, 0 start not allowed
+    final phoneRegex = RegExp(r'^[1-9]\d{9}$');
     if (!phoneRegex.hasMatch(phone)) {
       setState(() {
-        _errorMessage = "Please enter a valid 10-digit phone number";
+        _errorMessage = "10 digits only, cannot start with 0";
       });
       return;
     }
@@ -149,6 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           errorText: _errorMessage,
+                          errorMaxLines: 2,
                           contentPadding: const EdgeInsets.symmetric(vertical: 14),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
