@@ -452,12 +452,15 @@ class _MainShellState extends State<MainShell> {
                                 children: [
                                   const SizedBox(height: 30), // Fixed height matching icon slot
                                   const SizedBox(height: 6),
-                                  Text(
-                                    t("Thanks Note"),
-                                    style: TextStyle(
-                                      color: _currentIndex == 2 ? AppTheme.primary : AppTheme.textSecondary,
-                                      fontSize: 10,
-                                      fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      t("Thanks Note"),
+                                      style: TextStyle(
+                                        color: _currentIndex == 2 ? AppTheme.primary : AppTheme.textSecondary,
+                                        fontSize: 10,
+                                        fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -568,12 +571,15 @@ class _MainShellState extends State<MainShell> {
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              t(label),
-              style: TextStyle(
-                color: isSelected ? Colors.white : AppTheme.textSecondary,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                t(label),
+                style: TextStyle(
+                  color: isSelected ? Colors.white : AppTheme.textSecondary,
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ],

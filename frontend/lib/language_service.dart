@@ -128,6 +128,10 @@ class LanguageService {
     'Points & Attendance Rules': 'புள்ளிகள் & வருகை விதிமுறைகள்',
     'Description': 'விளக்கம்',
     'Per count': 'ஒரு முறைக்கு',
+    'TOTAL GIVEN': 'மொத்தம் வழங்கியது',
+    'TOTAL TAKEN': 'மொத்தம் பெற்றது',
+    'TOTAL COUNT': 'மொத்த எண்ணிக்கை',
+    'THIS TERM': 'இந்த முறை',
   };
 
   static String translate(String key) {

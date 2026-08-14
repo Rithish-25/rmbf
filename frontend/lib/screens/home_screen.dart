@@ -461,13 +461,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Text(
-                            t("THANKS SCORE SUMMARY"),
-                            style: GoogleFonts.outfit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                              letterSpacing: 0.5,
+                           Expanded(
+                            child: Text(
+                              t("THANKS SCORE SUMMARY"),
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -481,9 +483,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "TOTAL GIVEN",
-                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                Text(
+                                  t("TOTAL GIVEN"),
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -508,9 +510,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    "TOTAL TAKEN",
-                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  Text(
+                                    t("TOTAL TAKEN"),
+                                    style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -580,13 +582,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Text(
-                            t("THIS TERM"),
-                            style: GoogleFonts.outfit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                              letterSpacing: 0.5,
+                           Expanded(
+                            child: Text(
+                              t("THIS TERM"),
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -600,9 +604,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "TOTAL GIVEN",
-                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                Text(
+                                  t("TOTAL GIVEN"),
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -627,9 +631,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    "TOTAL TAKEN",
-                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                  Text(
+                                    t("TOTAL TAKEN"),
+                                    style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -698,14 +702,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               size: 20,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            t("R TO R"),
-                            style: GoogleFonts.outfit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                              letterSpacing: 0.5,
+                           Expanded(
+                            child: Text(
+                              t("R TO R"),
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ],
