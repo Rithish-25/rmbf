@@ -437,7 +437,7 @@ class _MainShellState extends State<MainShell> {
                   ),
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -446,12 +446,12 @@ class _MainShellState extends State<MainShell> {
                           GestureDetector(
                             onTap: () => setState(() => _currentIndex = 2),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const SizedBox(height: 30), // Fixed height matching icon slot
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 24), // Fixed height matching icon slot
+                                  const SizedBox(height: 2),
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
@@ -543,7 +543,7 @@ class _MainShellState extends State<MainShell> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: isSelected ? AppTheme.primaryGradient : null,
@@ -561,7 +561,7 @@ class _MainShellState extends State<MainShell> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 30, // Fixed height for icon slot to push text down
+              height: 24, // Fixed height for icon slot to push text down
               child: Center(
                 child: Icon(
                   isSelected ? solidIcon : outlineIcon,
@@ -570,7 +570,7 @@ class _MainShellState extends State<MainShell> {
                 ),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
