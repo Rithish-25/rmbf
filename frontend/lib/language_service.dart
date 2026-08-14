@@ -127,7 +127,7 @@ class LanguageService {
     'View History': 'வரலாற்றைக் காண்க',
     'Points & Attendance Rules': 'புள்ளிகள் & வருகை விதிமுறைகள்',
     'Description': 'விளக்கம்',
-    'Per count': 'ஒரு எண்ணிக்கைக்கு',
+    'Per count': 'ஒரு முறைக்கு',
   };
 
   static String translate(String key) {

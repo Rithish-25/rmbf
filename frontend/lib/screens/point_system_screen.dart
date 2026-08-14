@@ -70,8 +70,8 @@ class PointSystemScreen extends StatelessWidget {
               Table(
                 border: TableBorder.all(color: AppTheme.border, width: 1),
                 columnWidths: const {
-                  0: FlexColumnWidth(2.2),
-                  1: FlexColumnWidth(1.2),
+                  0: FlexColumnWidth(2.0),
+                  1: FlexColumnWidth(1.3),
                 },
                 children: [
                   const TableRow(
